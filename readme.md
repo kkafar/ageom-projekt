@@ -15,6 +15,46 @@
 
 # Sprawozdanie / dokumentacja
 
+1. [ ] Część techniczna
+    1. [ ] Opis programu ( z jakich modułów jest złożony, wymagania techniczne)
+    2. [ ] Sposób obsługi programu (jak korzystać)
+2. [ ] Sprawozdanie
+    1. [ ] Opis problemu (wyznaczanie otoczki wypukłej)
+    2. [ ] Definicje problemu, dowód na dolne ograniczenie złożonośći obliczeniowe, porównanie z sortowaniem
+    3. [ ] Opis każdego z algorytmów
+        1. [ ] Schemat działania (w punktach, polecenia w jezyku naturalnym)
+        2. [ ] Wyjaśnienie szczegółów (np. w jaki sposób jest znajdywana styczna itd.)
+        2. [ ] Analiza złożoności obliczeniowej
+        4. [ ] Kod (ewentualnie z komentarzami zawierającymi odnośniki do punktów schematu)
+        5. [ ] Opis wizualizacji (ewentualny)
+    4. [ ] Podsumowanie (tabelka z złożonościami)
+    5. [ ] Porównanie czasów wykonania i złożonośći, wykresy (statystyki)
+        1. [ ] Dla każdego typu zbioru osobno\
 
+
+### Typy zbiorów
+
+Testujemy dla n: 1000 - 20000, co 100
+
+1. [ ] Chmura punktów 
+2. [ ] Okrąg (R = 500) 
+3. [ ] Prostokąt 
+4. [ ] Śmieszny kwadrat (bez dwóch boków, z przekątnymi)
 
 # Prezentacja
+
+1. Przedstawienie problemu (opis problemu, definicje, dowód na dolne ograniczenie złożoności obliczeniowej, porównanie z sortowaniem)
+2. Opisy kolejnych algorytmów (slajdy powinny zaiwerać pełny opis)
+
+W trakcie prezentacji należy przedstawić sposób działania programu
+
+
+## Wszędzie dodać bibliografię i się podpisać 
+
+# Program
+
+1. [ ] Zrobimy jednego jupytera, w którym:
+    1. [ ] Instrukcja
+    2. [ ] Na początku wygenerujemy punkty
+    3. [ ] Będzie można przetestować kolejne algorytmy (zobaczyć jak działają) 
+    4. [ ] Do każdego algorytmu krótki opis działania.
