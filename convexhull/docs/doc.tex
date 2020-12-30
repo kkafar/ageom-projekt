@@ -1,0 +1,319 @@
+% K. Kafara
+\documentclass[11pt]{article}
+\usepackage[margin=1.35in]{geometry}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{multirow}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage[polish]{babel}
+\usepackage[normalem]{ulem}
+\usepackage[backend=biber,style=alphabetic,sorting=ynt]{biblatex}
+\addbibresource{bibliography.bib}
+
+
+\useunder{\uline}{\ul}{}
+\pgfplotsset{compat=1.9}
+\theoremstyle{remark} \newtheorem{definition}{def.}
+\theoremstyle{definition} \newtheorem{twierdzenie}{tw.}
+\newcommand{\bold}[1]{\textbf{#1}}
+\newcommand{\bemph}[1]{\textbf{\emph{#1}}}
+\newcommand{\eq}{\, = \,}
+\newcommand{\apeq}{\, \approx \,}
+\newcommand{\miunit}{\, \frac{v \cdot s}{a \cdot m}}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\bunit}{\, \mu T}
+\newcommand{\iunit}{\, mA}
+
+
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\author{K. Kafara\\Ł. Czarniecki}
+\title{\textbf{Otoczka wypukła dla zbioru punktów w przestrzeni dwuwymiarowej}\\Dokumentacja projektu\\Algorytmy geometryczne}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
+
+
+\section{Informacje techniczne}
+
+\subsection{Budowa programu}
+
+Program złożony jest z następujących modułów: 
+
+\begin{itemize}
+    \item   \emph{lib} -- biblioteczny -- zawiera zbiór pomocniczych funkcji i struktur danych wykorzystywanych przez algorytmy.
+    \item   \emph{pure} -- algorytmy w \emph{czystej postaci} tj. nie posiadające części wizualizacyjnej. 
+    \item   \emph{vis} -- algorytmy wraz z kodem odpowiadającym za wizualizację
+\end{itemize}
+
+
+Poniżej przedstawiamy dokładny opis zawartości poszczególnych modułów. 
+
+\subsubsection{Moduł \emph{lib}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{geometric\_tool\_lab.py} -- narzędzie graficzne dostarczone w ramach przedmiotu \emph{Algorytmy geometryczne}
+    \item   \emph{getrand.py} -- zawiera funkcje generujące zbiory punktów różnych typów 
+    \item   \emph{sorting.py} -- zawiera implementację iteracyjnej wersji algorytmu \emph{QuickSort} wykorzystywaną m.in w algorytmie Grahama
+    \item   \emph{stack.py} -- zawiera klasę implementującą \emph{stos}
+    \item   \emph{util.py} -- zawiera szereg funkcji pomocniczych wykorzystywanych przez zaimplementowane algorytmy
+    \item   \emph{mytypes.py} -- zawiera definicje typów stworzone w celu zwiększenia czytelności kodu
+\end{enumerate}
+
+
+\subsubsection{Moduł \emph{pure}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{divide\_conq.py} -- implementacja algorytmu dziel i zwyciężaj
+    \item   \emph{graham.py} -- implementacja algorytmu Grahama
+    \item   \emph{increase.py} -- implementacja algorytmu przyrostowego
+    \item   \emph{jarvis.py} -- implementacja algorytmu Jarvisa
+    \item   \emph{lowerupper.py} -- implementacja algorytmu "górna-dolna"
+\end{enumerate}
+
+\subsubsection{Moduł \emph{vis}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{divide\_conq\_vis.py} -- implementacja algorytmu dziel i zwyciężaj wraz z kodem tworzącym wizualizację
+    \item   \emph{graham\_vis.py} -- implementacja algorytmu Grahama wraz z kodem tworzącym wizualizację
+    \item   \emph{increase\_vis.py} -- implementacja algorytmu przyrostowego wraz z kodem tworzącym wizualizację
+    \item   \emph{jarvis\_vis.py} -- implementacja algorytmu Jarvisa wraz z kodem tworzącym wizualizację
+    \item   \emph{lowerupper\_vis.py} -- implementacja algorytmu "górna-dolna" wraz z kodem tworzącym wizualizację
+\end{enumerate}
+
+
+\subsection{Wymagania techniczne}
+
+\begin{enumerate}
+    \item   Python 3.9.0 64-bit lub nowszy
+    \item   Jupyter Notebook
+\end{enumerate}
+
+\subsection{Korzystanie z programu}
+
+\subsubsection{Uruchomienie wizualizacji}
+
+W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{program.ipynb},
+a następnie zapoznać się z zamieszczoną tam instrukcją. 
+
+
+\section{Oznaczenia i definicje}
+
+Na potrzeby dalszych wywodów przyjmujemy w tym miejscu szereg oznaczeń i definicji:
+
+
+
+
+\section{Problem}
+
+Wyznaczyć otoczkę wypukłą podanego zbioru punktów płaszczyzny dwuwymiarowej. 
+
+\section{Algorytmy}
+
+\subsection{Algorytm Grahama}
+
+    W celu opisania sposobu działania algorytmu Grahama, definiujemy następujacą relację $\preceq_Q$ określoną dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$ względem 
+    wybranego i ustalonego punktu odniesienia $Q$.
+
+    \begin{equation}
+        \label{eq:relacja-graham}
+        P_1 \preceq_Q P_2 \, \Leftrightarrow \, (\angle (P_1, Q, OX) < \angle (P_2, Q, OX)) \lor (\angle (P_1, Q, OX) \eq \angle (P_2, Q, OX) \land d(P_1, Q) <= d(P_2, Q))
+    \end{equation}
+
+    gdzie $d(P, Q)$ oznacza odległość od siebie dwóch dowolnych punktów płaszczyzny.
+
+    Tak zdefiniowana relacja jest liniowym porządkiem (zwrotna, antysymetryczna, przechodnia i spójna).
+
+    \subsubsection{Opis działania}
+
+    \begin{enumerate}
+        \item   Wyznaczamy najniższy punkt $Q$ wyjściowego zbioru (jeżeli jest wiele o tej samej rzędnej -- bierzemy ten o najmniejszej odciętej).
+        \item   Ustawiamy go jako pierwszy element zbioru. 
+        \item   Sortujemy pozostałe punkty względem relacji $\preceq_Q$.
+        \item   Usuwamy wszystkie, poza najbardziej oddalonym od Q, punkty leżące na półprostej $QP$, dla każdego $P$
+        \item   Kładziemy pierwsze 3 punkty zbioru na stos $S$. 
+        \item   Iterujemy kolejno po punktach z posortowanego zbioru nie będących na stosie:
+                Niech bieżącym punktem będzie P:
+
+                \begin{enumerate}
+                    \item   Dopóki $P$ nie jest po lewej stronie $S_{n-1}S_n$ wykonujemy (b)
+                    \item   Uswamy punkt ze stosu. 
+                    \item   Dodajemy $P$ na stos.
+                \end{enumerate}
+        \item Zwracamy zawartość stosu.
+    \end{enumerate}
+
+
+    \subsubsection{Szczegóły}
+
+    \begin{itemize}
+        \item   Najniższy punkt wyjściowego zbioru (punkt 1) wyznaczamy w czasie liniowym, iterując po kolejnych punktach zbioru. 
+        \item   Wszystkie punkty leżacej na jednej prostej, poza najbardziej oddalonym od $Q$ usuwamy w czasie liniowym w następujący sposób:
+                Iterując przez posortowaną tablicę, zaczynająć od indeksu $i := 1$, zapamiętujemy ostatni indeks na który wstawialiśmy $j$ (na początku $j := 1$).
+                Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe to $i := i+1$. Jeżeli nie są współliniowe to $P_i$ wpisujemy na pozycję $j$, a następnie $j := j + 1$. Następnie, 
+                w dalszej części algorytmu posługujemy się częścią tablicy $[0, \ldots, j - 1]$.
+    \end{itemize}    
+
+
+    \subsubsection{Złożoność}
+    
+    Operacją dominującą w algorytmie jest sortowanie -- realizowane w czasie $O(n \, lgn)$. Wybór punktu najniższego, redukcja punktów współlinowych oraz iterowanie (punkt 6, 
+    zauważmy, że każdy punkt zbioru wyjściowego jest obsługiwany co najwyżej 2 razy -- gdy jest dodawany do otoczki i gdy jest ewentualnie usuwany) są realizowane w
+    czasie $O(n)$. Algorytm Grahama ma zatem złożoność $O(n \, lgn)$.
+
+
+    \subsubsection{Kod}
+
+
+    \begin{lstlisting}[language=Python]
+def get_point_cmp(ref_point: Point, eps: float = 1e-7) -> Callable:
+    def point_cmp(point1, point2):
+        orient = orientation(ref_point, point1, point2, eps)
+        
+        if orient == -1:
+            return False
+        elif orient == 1:
+            return True
+        elif dist_sq(ref_point, point1) <= dist_sq(ref_point, point2):
+            return True
+        else:
+            return False
+
+    return point_cmp
+
+
+def graham(points: ListOfPoints) -> ListOfPoints:
+    istart = index_of_min(points, 1)
+
+    points[istart], points[0] = points[0], points[istart]    
+
+    qsort_iterative(points, get_point_cmp(points[0]))
+
+    i, new_size = 1, 1
+    while i < len(points):
+        while (i < len(points) - 1) \
+        and \
+        (orientation(points[0], points[i], points[i + 1], 1e-7) == 0):  
+            i += 1
+        
+        points[new_size] = points[i]
+        new_size += 1
+        i += 1
+    
+    s = Stack()
+    s.push(points[0])
+    s.push(points[1])
+    s.push(points[2])
+    
+    for i in range(3, new_size, 1):
+        while orientation(s.sec(), s.top(), points[i], 1e-7) != 1:
+            s.pop()
+
+        s.push(points[i])
+
+    return s.s[:s.itop+1]
+        
+    \end{lstlisting}
+
+
+
+\subsection{Algorytm Jarvisa}
+    \subsubsection{Opis działania}
+    \begin{enumerate}
+        \item   Wyznaczamy najniższy punkt $Q$ wyjściowego zbioru (jeżeli jest wiele o tej samej rzędnej -- bierzemy ten o najmniejszej odciętej).
+        \item   Dodajemy $Q$ do zbioru punktów otoczki 
+    \end{enumerate}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+
+
+
+\subsection{Algorytm górna-dolna}
+    \subsubsection{Opis działania}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+
+
+
+\subsection{Algorytm przyrostowy}
+    \subsubsection{Opis działania}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+
+\newpage
+
+\subsection{Algorytm dziel i zwyciężaj}
+    \subsubsection{Opis działania}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+
+
+
+\subsection{Algorytm Chana}
+    \subsubsection{Opis działania}
+    cokolwiek \cite{markdeberg}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+    
+    
+    
+    \medskip
+
+\printbibliography
+
+\end{document}  

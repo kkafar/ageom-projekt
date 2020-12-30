@@ -51,7 +51,6 @@ def graham(points: ListOfPoints) -> ListOfPoints:
     # Usuwamy punkty o równych kątach
     # Działa to tak, że iterujemy po całej tablicy, przepisując 'unikalne' punkty na początek tablicy. 
     # W dalszej części algorytmu rozważamy tylko początkoy fragment tablicy zawierający punkty unikalne.
-    # dzielimy przez 2, bo każdy punkt wnosi 2 do rozmiaru tablicy (np.array)
     i, new_size = 1, 1
     while i < len(points):
         # jeżeli kolejne punkty są współliniowe to pomijamy je tak długo, aż dojdziemy do ostatniego z nich
