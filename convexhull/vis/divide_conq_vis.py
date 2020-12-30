@@ -6,7 +6,7 @@ from pprint import pprint
 import operator 
 
 
-def merge_convex_hulls_viz(left_convex_hull: list[Point], right_convex_hull: list[Point], points: list[Point], scenes: list[Scene]) -> list[Point]:
+def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: list[Point], points: list[Point], scenes: list[Scene]) -> list[Point]:
     """ Łączenie dwóch rozdzielnych otoczek. Otoczki muszą być zadane w formie wierzchołków podanych w kolejności przeciwnej do 
     ruchu wskazówek zegara. Ponadto left_convex_hull powinno być lewą otoczką, a right_convex_hull prawą. """
 
@@ -263,7 +263,7 @@ def divide_conq_viz(point2_set: list[Point], k: int) -> Union[tuple[list[Point],
 
 
 
-        merged_convex_hull = merge_convex_hulls_viz(left_convex_hull, right_convex_hull, point2_set, scenes)
+        merged_convex_hull = merge_convex_hulls_vis(left_convex_hull, right_convex_hull, point2_set, scenes)
 
         scenes.append(Scene(
             points=[
