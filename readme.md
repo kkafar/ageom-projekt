@@ -9,8 +9,8 @@
 
 ## Issues
 
-1. [ ] Naprawa importów
-
+1. [x] Naprawa importów
+2. [ ] Poprawić obsługę przpadku podstawowego w dziel i rządź (obsługiwać jakimś algorytmem, a nie przy k <= 2)
 
 
 # Sprawozdanie / dokumentacja

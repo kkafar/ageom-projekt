@@ -119,7 +119,10 @@ def index_of_min(points: list[Point], cmp_idx = 0) -> Union[int, None]:
     min_idx = 0
 
     for i in range(1, len(points)):
-        if points[i][cmp_idx] < min_el[cmp_idx]:
+        if  points[i][cmp_idx] < min_el[cmp_idx] \
+            or \
+            points[i][cmp_idx] == min_el[cmp_idx] and points[i][1 - cmp_idx] < min_el[1 - cmp_idx]:
+                
             min_el = points[i]
             min_idx = i
         
@@ -136,7 +139,10 @@ def index_of_max(points: list[Point], cmp_idx = 0) -> Union[int, None]:
     max_idx = 0
     
     for i in range(1, len(points)):
-        if points[i][cmp_idx] > max_el[cmp_idx]:
+        if  points[i][cmp_idx] > max_el[cmp_idx] \
+            or \
+            points[i][cmp_idx] == max_el[cmp_idx] and points[i][1 - cmp_idx] > max_el[1 - cmp_idx]:
+                
             max_el = points[i]
             max_idx = i
             
