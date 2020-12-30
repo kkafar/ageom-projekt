@@ -10,8 +10,6 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     """ Łączenie dwóch rozdzielnych otoczek. Otoczki muszą być zadane w formie wierzchołków podanych w kolejności przeciwnej do 
     ruchu wskazówek zegara. Ponadto left_convex_hull powinno być lewą otoczką, a right_convex_hull prawą. """
 
-    print("lacze:", left_convex_hull, right_convex_hull)
-
     left_ch_size = len(left_convex_hull)
     right_ch_size = len(right_convex_hull)
 
@@ -19,7 +17,6 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     # znajdujemy prawy skrajny punkt lewej otoczki 
     left_ch_rightmost_idx = index_of_max(left_convex_hull, cmp_idx=0)
     right_ch_leftmost_idx = index_of_min(right_convex_hull, cmp_idx=0)
-
     
     left = left_convex_hull[left_ch_rightmost_idx]
     right = right_convex_hull[right_ch_leftmost_idx]
@@ -28,22 +25,20 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     
 
     # górna styczna
-    while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) != -1 or orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) != 1:
-
+    while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1 or orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
         # podnosimy punkt na prawej otoczce
-        while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) != -1:
+        while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1:
             right_idx = (right_idx - 1) % right_ch_size
             right = right_convex_hull[right_idx]
 
         # podnosimy punkt na lewej otoczce
-        while orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) != 1:
+        while orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
             left_idx = (left_idx + 1) % left_ch_size
             left = left_convex_hull[left_idx]
             
             
     upper_tangent_left_idx = left_idx
     upper_tangent_right_idx = right_idx
-    
             
     # dolna styczna
     left = left_convex_hull[left_ch_rightmost_idx]
@@ -51,75 +46,77 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     left_idx = left_ch_rightmost_idx
     right_idx = right_ch_leftmost_idx
             
-    while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) != 1 or orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) != -1:
-        
+    while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) == -1 or orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) == 1:
         # opuszczamy punkt na prawej otoczce
-        while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) != 1:
+        while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) == -1:
             right_idx = (right_idx + 1) % right_ch_size
             right = right_convex_hull[right_idx]
 
         # opuszczamy punkt na lewej otoczce
-        while orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) != -1:
+        while orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) == 1:
             left_idx = (left_idx - 1) % left_ch_size
             left = left_convex_hull[left_idx]
             
             
     lower_tangent_left_idx = left_idx
     lower_tangent_right_idx = right_idx
-        
-        
+    
+
+    
     merged_convex_hull = [ ]
 
-    while upper_tangent_left_idx != ((lower_tangent_left_idx + 1) % left_ch_size):
+    while upper_tangent_left_idx != lower_tangent_left_idx:
         merged_convex_hull.append(left_convex_hull[upper_tangent_left_idx])
         upper_tangent_left_idx = (upper_tangent_left_idx + 1) % left_ch_size
+    else:
+        merged_convex_hull.append(left_convex_hull[lower_tangent_left_idx])
         
-    while lower_tangent_right_idx != ((upper_tangent_right_idx + 1) % right_ch_size):
+        
+    while lower_tangent_right_idx != upper_tangent_right_idx:
         merged_convex_hull.append(right_convex_hull[lower_tangent_right_idx])
         lower_tangent_right_idx = (lower_tangent_right_idx + 1) % right_ch_size    
+    else:
+        merged_convex_hull.append(right_convex_hull[lower_tangent_right_idx])
     
-    
-    
-    print("Zloczone:", merged_convex_hull)
     return merged_convex_hull 
 
 
+def divide_conq(point2_set: list[Point], k: int) -> Union[list[Point], None]:
+    if len(point2_set) < 3 or k <= 0: return None     
 
-
-def divide_conq(point2_set: list[Point]) -> Union[list[Point], None]:
     
-    def divide_conq_rec(point2_set: list[Point]):
-        print("Wywolanie divide_conq na", point2_set)
-        if len(point2_set) <= 2: return point2_set
+    def divide_conq_rec(point2_set: list[Point]) -> list[Point]:
+        if len(point2_set) <= k: return point2_set
     
-        left_convex_hull = divide_conq(point2_set[ : len(point2_set) // 2])
-        right_convex_hull = divide_conq(point2_set[len(point2_set) // 2 : ])
+        left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
+        right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])
     
         return merge_convex_hulls(left_convex_hull, right_convex_hull)
     
     point2_set.sort(key = operator.itemgetter(0, 1))    
 
-    
     return divide_conq_rec(point2_set)
     
-    
-
-
-
 
 def main():
-    random_points = rand_point2_set(10, 0, 10).tolist()
+    # points_save_path = './divide_conq_data/points.json'
 
-    pprint(random_points)
+    points = rand_point2_set(30, 0, 10).tolist()
+    # points = load_points_from_json(points_save_path)
+    
+    # save_points_to_json(points_save_path, points, 4)
+
+    pprint(points)
+
 
     print("--" * 10)
 
 
-    convex_hull = divide_conq(random_points)
-    
+    convex_hull = divide_conq(points, 2)
     
     pprint(convex_hull)
     
+
     
 if __name__ == "__main__":
     main()

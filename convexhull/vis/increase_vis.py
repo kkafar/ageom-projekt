@@ -6,6 +6,7 @@ from pprint import pprint
 import operator
 
 
+
 def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
     """ Zwraca punkt styczności (w formie indeksu) wielokąta WYPUKŁEGO polygon z prawą styczną poprowadzoną z punktu 
     nie należącego do wielokąta - point """
@@ -118,55 +119,6 @@ def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
                     right = mid
                 else:
                     left = mid
-                 
-        
-        
-def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
-    if len( point2_set ) < 3: return None
-    
-    # posortowanie punktów po wsp. x na początku, pozwoli na pominięcie kroku z sprawdzaniem należenia punktu do wnętrza otoczki 
-    # ponieważ biorąc każdy kolejny punkt, mamy gwarancję, że nie należy od do obecnie rozważanej otoczki
-    
-    point2_set.sort(key = operator.itemgetter(0, 1))
-    
-    # bierzemy pierwsze 3 punkty i tworzymy z nich otoczkę
-    convex_hull = point2_set[:3]
-
-    # musimy zapewnić, że wierzchołki wyjściowej otoczki są podane w kolejności przeciwnej do ruchu wskazówek zegara
-    if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
-        convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
-    
-    
-    for i in range(3, len( point2_set )):
-        # jeżeli obecnie sprawdzany punkt nie należy do wnętrza otoczki (convex_hull) to:
-            # znajdujemy styczne do otoczki przechodzące przez obecnie sprawdzany punkt
-            # aktualizujemy otoczkę poprzez
-                # wszysktie punktu pomiędzy punktami styczności zastępujemy tym jednym, nowym
-
-        # znajdujemy styczne 
-        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
-        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
-        
-        # aktualizujemy otoczkę (TODO PYTANIE czy da się aktualizować otoczkę w czasie stałym?)
-        left_tangent_point = convex_hull[left_tangent_idx]
-        right_tangent_point = convex_hull[right_tangent_idx]        
-
-        deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
-
-        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
-            step = 0
-        else: 
-            step = -1
-            
-        left = (left_tangent_idx + 1) % len(convex_hull)
-        
-        while convex_hull[left] != right_tangent_point:
-            convex_hull.pop(left)
-            left = (left + step) % len(convex_hull)
-            
-        convex_hull.insert(left, point2_set[i])
-
-    return convex_hull
 
 
 def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[tuple[ListOfPoints, Plot], None]:
@@ -274,33 +226,29 @@ def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[tuple[ListOfPoi
 
     return convex_hull, plot
 
-
-
+    
+    
 def main(): 
-    file_path = 'test_data/points3.json'
-    save_file_path = 'test_data/convex_hull3.json'
+    # file_path = 'test_data/points3.json'
+    # save_file_path = 'test_data/convex_hull3.json'
     
     point_count = 30
     
     point_set = rand_point2_set(point_count, 0, 10).tolist()
     # point_set = load_points_from_json(file_path)
 
-    save_points_to_json(file_path, point_set, indent=4)
+    # save_points_to_json(file_path, point_set, indent=4)
     pprint(point_set)
     print('-' * 10)
     
     convex_hull, plot = increase_with_sorting_vis(point_set)
     
-    save_points_to_json(save_file_path, convex_hull, indent = 4)    
+    # save_points_to_json(save_file_path, convex_hull, indent = 4)    
     
     pprint(convex_hull)
-    
-    
-    
     
     plot.draw()
 
 if __name__ == "__main__": 
     main()
-
 
