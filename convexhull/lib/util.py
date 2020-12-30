@@ -147,3 +147,12 @@ def index_of_max(points: list[Point], cmp_idx = 0) -> Union[int, None]:
             max_idx = i
             
     return max_idx
+
+
+def dist_sq(p1, p2):
+    """ Zwraca kwadrat odległości pom. dwoma punktami"""
+    return (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
+
+def swap_points(p, q):
+    """ Zamienia współrzędne dwóch punktów """
+    p[0], p[1], q[0], q[1] = q[0], q[1], p[0], p[1]
