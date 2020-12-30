@@ -1,3 +1,7 @@
+import os
+from sys import path
+path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
+
 from lib.mytypes import ListOfPoints
 from lib.geometric_tool_lab import *
 from lib.util import *
