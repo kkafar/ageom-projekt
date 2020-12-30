@@ -41,7 +41,7 @@ def jarvis(points: ListOfPoints) -> ListOfPoints:
                     
                 # jeżeli jest zerem (z dokładnością do tolerancji)
                 # to sprawdzamy odległośc i bierzemy ten dalszy
-                elif orient == 0 and (dist(points[prev], points[imax]) < dist(points[prev], points[i])):
+                elif orient == 0 and (dist_sq(points[prev], points[imax]) < dist_sq(points[prev], points[i])):
                     imax = i
                     
                         
