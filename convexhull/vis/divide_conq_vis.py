@@ -7,6 +7,7 @@ from lib.mytypes import ListOfPoints
 from lib.geometric_tool_lab import *
 from lib.util import *
 from lib.getrand import *
+from pure.graham import graham
 from pprint import pprint
 import operator 
 
@@ -200,14 +201,34 @@ def divide_conq_viz(point2_set: list[Point], k: int) -> Union[tuple[list[Point],
     
 
     def divide_conq_rec_viz(points: list[Point], scenes: list[Scene]) -> list[Point]:
-        if len(points) <= k:
+        if len(points) <= 2:
             scenes.append(Scene(
                 points=[
                     PointsCollection(point2_set, marker='.'),
-                    PointsCollection(points, color='orchid')
+                    PointsCollection(points, marker='s', color='r')
+                ],
+                lines=[
+                    LinesCollection([
+                        [ points[0], points[1 % len(points)] ]
+                    ], linestyle='--', color='r')
                 ]
             ))
             return points
+        elif len(points) <= k:
+            convex_hull = graham(points)
+            scenes.append(Scene(
+                points=[
+                    PointsCollection(point2_set, marker='.'),
+                    PointsCollection(convex_hull, marker='s', color='r')
+                ],
+                lines=[
+                    LinesCollection([
+                        [ points[i], points[(i + 1) % len(points)] ]
+                        for i in range(len(points))
+                    ], linestyle='--', color='r')
+                ]
+            ))
+            return convex_hull
 
         scenes.append(Scene(
             points=[
@@ -331,7 +352,7 @@ def main():
     print("--" * 10)
 
 
-    convex_hull, plot = divide_conq_viz(points, 2)
+    convex_hull, plot = divide_conq_viz(points, 5)
     
     pprint(convex_hull)
     

@@ -6,6 +6,7 @@ from lib.mytypes import ListOfPoints
 from lib.geometric_tool_lab import *
 from lib.util import *
 from lib.getrand import *
+from pure.graham import graham
 from pprint import pprint
 import operator
 
@@ -90,7 +91,8 @@ def divide_conq(point2_set: list[Point], k: int) -> Union[list[Point], None]:
 
     
     def divide_conq_rec(point2_set: list[Point]) -> list[Point]:
-        if len(point2_set) <= k: return point2_set
+        if len(point2_set) <= 2: return point2_set
+        elif len(point2_set) <= k: return graham(point2_set)
     
         left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
         right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])
