@@ -262,7 +262,6 @@ def graham(points: ListOfPoints) -> ListOfPoints:
         s.push(points[i])
 
     return s.s[:s.itop+1]
-        
     \end{lstlisting}
 
 
@@ -271,12 +270,70 @@ def graham(points: ListOfPoints) -> ListOfPoints:
     \subsubsection{Opis działania}
     \begin{enumerate}
         \item   Wyznaczamy najniższy punkt $Q$ wyjściowego zbioru (jeżeli jest wiele o tej samej rzędnej -- bierzemy ten o najmniejszej odciętej).
-        \item   Dodajemy $Q$ do zbioru punktów otoczki 
+        \item   Dodajemy $Q$ do zbioru punktów otoczki. 
+        \item   Przeglądamy punkty zbioru w poszukiwaniu takiego, który wraz z ostatnim punktem otoczki tworzy najmniejszy kąt skierowany względem ostatniej znanej
+                krawędzi otoczki. Dla pierwszego szukanego punktu, kąt namierzamy względem poziomu.
+        \item   Znaleziony punkt dodajemy do zbioru punktów otoczki, jeżeli jest różny od $Q$.
+        \item   Powtarzamy punkty 3 i 4 tak długo aż znalezionym punktem nie będzie $Q$.
+        \item   Zwracamy listę punktów otoczki. 
     \end{enumerate}
     \subsubsection{Szczegóły}
+    \begin{itemize}
+        \item   Najniższy punkt wyjściowego zbioru (punkt 1) wyznaczamy w czasie liniowym, iterując po kolejnych punktach zbioru.
+        \item   W celu wyznaczenia punktu wyspecyfikowanego w punkcie 3. nie obliczamy wartości odpowiedniego kąta. Zamiast tego, równoważnie, wyznaczamy punkt $P$, 
+                który wraz z ostatnim znanym punktem otoczki $P_0$ tworzy wektor $\vec{P_0P}$ dla którego wszystkie pozostałe punkty zbioru są po lewej stronie. Robimy 
+                to w czasie liniowym korzystając z znanych własności wyznacznika. 
+    \end{itemize}
     \subsubsection{Złożoność}
+
+    Zauważmy, że jeżeli otoczka jest $k$ - elementowa, to główna pętla algorytmu (punkty 3--4) wykonuje się $k$-razy. Każdy krok pętli (znalezienie odpowiedniego punktu $P$) zajmuje czas liniowy. 
+    Pozostałe operacj w algorytmie zajmują co najwyżej czas liniowy. Zatem algrytm Jarvisa ma złożoność $O(nk)$.
+
     \subsubsection{Kod}
 
+    \begin{lstlisting}[language=Python]
+def jarvis(points: ListOfPoints) -> ListOfPoints:
+EPS = 1e-8
+
+convex_hull = []
+
+start_idx = index_of_min(points, 1)
+
+convex_hull.append(start_idx)
+
+rand_idx = 0 if start_idx != 0 else 1
+
+prev = start_idx
+
+while True:
+    imax = rand_idx
+        
+    for i in range(len(points)):
+        if i != prev and i != imax:
+            orient = orientation(
+                        points[prev], 
+                        points[imax], 
+                        points[i], 
+                        EPS
+                     )
+            if orient == -1:
+                imax = i
+                
+            elif orient == 0 and \
+                 (dist_sq(points[prev], points[imax]) < dist_sq(points[prev], points[i])):
+                imax = i
+                
+    if imax == start_idx:
+        break;
+
+    convex_hull.append(imax)
+    
+    prev = imax
+
+return points[convex_hull]
+    \end{lstlisting}
+
+    W ostatniej linii algorytmu, korzystamy z możliwości bibliteki \emph{numpy}.
 
 
 \subsection{Algorytm górna-dolna}
