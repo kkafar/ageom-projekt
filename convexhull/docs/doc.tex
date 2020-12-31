@@ -165,10 +165,13 @@ Wyznaczyć otoczkę wypukłą podanego zbioru punktów płaszczyzny dwuwymiarowe
     W celu opisania sposobu działania algorytmu Grahama, definiujemy następujacą relację $\preceq_Q$ określoną dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$ względem 
     wybranego i ustalonego punktu odniesienia $Q$.
 
-    \begin{equation}
+    \begin{eqnarray*}
         \label{eq:relacja-graham}
-        P_1 \preceq_Q P_2 \, \Leftrightarrow \, (\angle (P_1, Q, OX) < \angle (P_2, Q, OX)) \lor (\angle (P_1, Q, OX) \eq \angle (P_2, Q, OX) \land d(P_1, Q) <= d(P_2, Q))
-    \end{equation}
+        P_1 \preceq_Q P_2 \, \Leftrightarrow \, 
+        (\angle (P_1, Q, OX) < \angle (P_2, Q, OX)) 
+        \lor
+        (\angle (P_1, Q, OX) \eq \angle (P_2, Q, OX) \land d(P_1, Q) \leq d(P_2, Q)) 
+    \end{eqnarray*}
 
     gdzie $d(P, Q)$ oznacza odległość od siebie dwóch dowolnych punktów płaszczyzny.
 
@@ -333,24 +336,293 @@ while True:
 return points[convex_hull]
     \end{lstlisting}
 
-    W ostatniej linii algorytmu, korzystamy z możliwości bibliteki \emph{numpy}.
+    W ostatniej linii algorytmu, korzystamy z możliwości bibliteki \emph{numpy}.\\
 
 
 \subsection{Algorytm górna-dolna}
     \subsubsection{Opis działania}
-    \subsubsection{Szczegóły}
+    \begin{enumerate}
+        \item   Sortujemy punkty rosnąco po odciętych (w przypadku rówych, mniejszy jest punkt o mniejszej rzędnej).
+        \item   Pierwsze dwa punkty z posortowanego zbioru wpisujemy do zbioru punktów otoczki górnej oraz dolnej.
+        \item   Iterujemy po zbiorze punktów zaczynając od $i = 2$ (trzeciego punktu), niech $P$ będzie bieżącym punktem:
+                \begin{enumerate}
+                    \item   Dopóki górna (dolna) otoczka ma co najmniej 2 punkty i $P$ nie znajduje się po prawej (lewej) stronie odcinka skierowanego utworzonego przez ostatniej
+                            dwa punkty otoczki (ostatni jest końcem odcinka), wykonujemy (b):
+                    \item   Usuwamy ostatni punkt z otoczki górej (dolnej).
+                    \item   Dodajemy $P$ do punktów otoczki górnej (dolnej).
+                \end{enumerate}
+        \item   Odwracamy kolejność wierzchołków w otoczce dolnej.
+        \item   Łączymy zbioru punktów otoczki górnej oraz dolnej.
+        \item   Zwracamy złączony zbiór punktów otoczki. 
+    \end{enumerate}
+
+    % \subsubsection{Szczegóły}
+
     \subsubsection{Złożoność}
+    
+    Dominującą operacją w algorytmie jest sortowanie realizowane w czasie $O(n \, lgn)$. Każdy krok pętli (dla wyznaczania otoczki górnej oraz dolnej) zajmuje czas stały. Zauważmy, że podobnie do 
+    algorytmu Grahama każdy z punktów jest rozważany co najwyżej dwukrotnie -- w momencie dodania do otoczki i przy ewentualnym usunięciu ze zbioru punktów otoczki. Pozostałe operacje realizowane są w 
+    czasie liniowym. Zatem algorytm "górna-dolna" ma złożoność $O(n \, lgn)$.
+
     \subsubsection{Kod}
+
+\begin{lstlisting}[language=Python]
+def lower_upper(point2_set: ListOfPoints) -> ListOfPoints:
+if len(point2_set) < 3: return None
+
+point2_set.sort(key = operator.itemgetter(0, 1))
+
+upper_ch = [ point2_set[0], point2_set[1] ] 
+lower_ch = [ point2_set[0], point2_set[1] ]
+
+for i in range( 2, len(point2_set) ):
+    while len(upper_ch) > 1 and orientation(upper_ch[-2], upper_ch[-1], point2_set[i]) != -1:
+        upper_ch.pop()
+
+    upper_ch.append(point2_set[i])
+
+for i in range(2, len(point2_set) ):
+    while len(lower_ch) > 1 and orientation(lower_ch[-2], lower_ch[-1], point2_set[i]) != 1:
+        lower_ch.pop()
+
+    lower_ch.append(point2_set[i])
+
+lower_ch.reverse()
+upper_ch.extend(lower_ch)
+
+return upper_ch
+\end{lstlisting}
 
 
 
 \subsection{Algorytm przyrostowy}
     \subsubsection{Opis działania}
+    Ogólne sformułowanie algorytmu ma postać:
+    \begin{enumerate}
+        \item   Dodajemy pierwsze 3 punkty do zbioru punktów otoczki. 
+        \item   Iterujemy po pozostałych punktach. Niech $P$ będzie punktem bieżącym:
+                \begin{enumerate}
+                    \item   Jeżeli $P$ nie należy do wnętrza obecnie znanej otoczki wykonumejmy (b) oraz (c).
+                    \item   Znajdujemy styczne do obecnie znanej otoczki poprowadzone przez punkt $P$. 
+                    \item   Aktualizujemy otoczkę.
+                \end{enumerate}
+        \item   Zwracamy punkty otoczki. 
+    \end{enumerate}
+
+
+    Możemy go jednak sformułować inaczej, co pozwoli na uproszenie implementacji, przy zachowaniu takiego samego rzędu złożoności. 
+
+    \begin{enumerate}
+        \item   Sortujemy punkty rosnąco po odciętych (w przypadku rówych, mniejszy jest punkt o mniejszej rzędnej).
+        \item   Dodajemy pierwsze 3 punkty do zbioru punktów otoczki, w takiej kolejności, aby były podane w kolejności odwrotnej 
+                do ruchu wskazówek zegara. 
+        \item   Iterujemy po pozostałych punktach. Niech $P$ będzie punktem bieżącym: 
+                \begin{enumerate}
+                    \item   Znajdujemy styczne do obecnie znanej otoczki poprowadzone przez punkt $P$.
+                    \item   Aktualizujemy otoczkę. 
+                \end{enumerate}
+        \item   Zwracamy punkty otoczki.
+    \end{enumerate}
+
+
+    Dzięki wstępnemu posortowaniu puntków, omijamy konieczność testowania należenia $P$ do otoczki znanej w danym kroku algorytmu, ponieważ
+    biorąc kolejny punkt mamy gwarancję, że nie należy on do wcześniej znanej otoczki. 
+
+
+
     \subsubsection{Szczegóły}
+        \subsubsection*{Wyznaczanie stycznych}
+
+        Styczne wyznaczamy w czasie logartymicznym względem liczby punktów należących do otoczki do której szukamy stycznych, 
+        wykonując poszukiwanie binarne elementów skrajnych (najmniejszego i największego) względem następującego porządku, 
+        określonego dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$, względem ustalonego punktu $Q$: \\
+        $P_1 >_Q P_2 \Leftrightarrow P_2$ znajduje się po lewej stronie odcinka skierowanego $QP_1$.
+
+        W tak określonym porządku elementem największym będzie prawy punkt styczności $P_{max}$, ponieważ wszystkie inne punkty otoczki 
+        znajdują się na lewo od prostej (stycznej) $QP_{max}$. Podobnie lewym punktem styczności będzie element najmniejszy 
+        w zadanym porządku $P_{min}$. \\
+
+        Wyznaczanie $P_{max}$ ($P_{min}$ wyznaczamy w sposób zupełnie analogiczny):\\
+        Wprowadźmy najpierw potrzebne oznaczenia: \\
+        $Q$ punkt zewnętrzny, przez który mają przechodzić styczne do otoczki.\\
+        Niech otoczka będzie dana w postaci ciągu punktów $P_0, \ldots, P_{k-1}$ ($P_k := P_0$) będących współrzędnymi kolejnych wierzchołków w kolejności przeciwnej
+        do ruchu wskazówek zegara.\\ 
+        Krawędź skierowaną otoczki $e_i$ definiujemy następująco: $e_i := P_iP_{i+1}$. \\
+        Krawędź $e_i := P_iP_{i+1}$ jest skierowana w górę $\Leftrightarrow$ $P_{i+1} >_Q P_i$.\\
+        Krawędź $e_i$ jest skierowana w dół, jeżeli nie jest skierowana w górę. 
+
+        \begin{enumerate}
+            \item   Jeżeli $P_0$ jest większy od swoich obudwu sąsiadów, to go zwracamy jako element
+                    największy. 
+            \item   Definujemy indeksy $l := 0$, $r := k$
+            \item   Dopóki nie znajdziemy elementu największego:
+                    \begin{enumerate}
+                    \item   Wyznaczamy indeks środkowego elementu $m := \left\lfloor \frac{l + k}{2} \right\rfloor$
+                    \item   Jezeli $P_m$ jest elementem największym:
+                            \begin{itemize}
+                                \item   Zwracamy $P_m$.
+                            \end{itemize}
+                    \item   Jeżeli $e_l$ jest skierowana w górę:
+                            \begin{enumerate}
+                                \item   Jeżeli $e_m$ jest skierowana w dół 
+                                        \begin{itemize}
+                                            \item $r := m$
+                                        \end{itemize}
+                                \item   W przeciwnym przypadku
+                                        \begin{enumerate}
+                                            \item   Jeżeli $P_l >_Q P_m$:
+                                                    \begin{itemize}
+                                                        \item $r := m$
+                                                    \end{itemize}
+                                            \item   W przeciwnym przypadku
+                                                    \begin{itemize}
+                                                        \item $l := m$
+                                                    \end{itemize}
+                                        \end{enumerate}
+                            \end{enumerate}
+                    \item   W przeciwnym przypadku:
+                            \begin{enumerate}
+                                \item   Jeżeli $e_m$ jest skierowana w górę:
+                                        \begin{itemize}
+                                            \item $l := m$
+                                        \end{itemize}
+                                \item   W przeciwnym przypadku: 
+                                        \begin{enumerate}
+                                            \item   Jeżeli $P_m >_Q P_l$:
+                                                    \begin{itemize}
+                                                        \item $r := m$
+                                                    \end{itemize}
+                                            \item   W przeciwnym przypadku:
+                                                    \begin{itemize}
+                                                        \item $l := m$
+                                                    \end{itemize}
+                                        \end{enumerate}
+                            \end{enumerate}
+                    \end{enumerate}
+        \end{enumerate}
+
+        % Przeanalizujmy powyższy algorytm. 
+
+        % Sprawdzamy najpierw czy $P_0$ nie jest szukanym punktem. Jest nim wtedy, gdy 
     \subsubsection{Złożoność}
+        Posortowanie punktów zajmuje $O(n \, lgn)$. Każde wykonanie pętli zajmuje czas logarytmiczny względem liczebności otoczki
+        znanej w danej iteracji. Zatem złożoność algorytmu jest rzędu $O(n \, lgn)$\\
+
     \subsubsection{Kod}
 
-\newpage
+\begin{lstlisting}[language=Python]
+def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    n = len(polygon)
+
+    if n < 3: return None
+
+    if orientation(polygon[0], polygon[1], point) == 1 and orientation(polygon[-1], polygon[0], point) == -1:
+        return 0
+    
+    left = 0
+    right = n
+    
+    while True:
+        mid = (left + right) // 2
+        
+        is_mid_down: bool = (orientation(polygon[mid], polygon[(mid + 1) % n], point) == 1)
+        
+        if is_mid_down and orientation(polygon[mid - 1], polygon[mid], point) == -1: 
+            return mid % n
+        
+        is_left_up: bool = (orientation(polygon[left % n], polygon[(left + 1) % n], point) == -1)
+        
+        if is_left_up:
+            if is_mid_down:
+                right = mid
+            else:
+                if orientation(point, polygon[left], polygon[mid]) == 1:
+                    right = mid
+                else:
+                    left = mid
+        else:
+            if not is_mid_down:
+                left = mid
+            else:
+                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+                    
+    
+def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
+    n = len(polygon)
+    
+    if n < 3: return None
+
+    left = 0
+    right = n
+    
+    if orientation(point, polygon[1], polygon[0]) == 1 and orientation(point, polygon[-1], polygon[0]) == 1:
+        return 0
+    
+    while True:
+        mid = (left + right) // 2
+
+        is_mid_down: bool = (orientation(point, polygon[mid % n], polygon[(mid + 1) % n]) == 1)
+        
+        if (not is_mid_down) and orientation(point, polygon[(mid - 1) % n], polygon[mid % n]) == 1:
+            return mid % n
+        
+        is_left_down: bool = (orientation(point, polygon[left], polygon[(left + 1) % n]) == 1)
+        
+        if is_left_down:
+            if not is_mid_down:
+                right = mid
+            else:
+                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+        else:
+            if is_mid_down:
+                left = mid
+            else:
+                if orientation(point, polygon[left % n], polygon[mid % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+
+        
+def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
+    if len( point2_set ) < 3: return None
+    
+    point2_set.sort(key = operator.itemgetter(0, 1))
+    
+    convex_hull = point2_set[:3]
+
+    if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
+        convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
+    
+    for i in range(3, len( point2_set )):
+        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
+        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
+        
+        left_tangent_point = convex_hull[left_tangent_idx]
+        right_tangent_point = convex_hull[right_tangent_idx]        
+
+        deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
+
+        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
+            step = 0
+        else: 
+            step = -1
+            
+        left = (left_tangent_idx + 1) % len(convex_hull)
+        
+        while convex_hull[left] != right_tangent_point:
+            convex_hull.pop(left)
+            left = (left + step) % len(convex_hull)
+            
+        convex_hull.insert(left, point2_set[i])
+
+    return convex_hull
+\end{lstlisting}
 
 \subsection{Algorytm dziel i zwyciężaj}
     \subsubsection{Opis działania}

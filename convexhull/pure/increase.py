@@ -143,11 +143,6 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     
     
     for i in range(3, len( point2_set )):
-        # jeżeli obecnie sprawdzany punkt nie należy do wnętrza otoczki (convex_hull) to:
-            # znajdujemy styczne do otoczki przechodzące przez obecnie sprawdzany punkt
-            # aktualizujemy otoczkę poprzez
-                # wszysktie punktu pomiędzy punktami styczności zastępujemy tym jednym, nowym
-
         # znajdujemy styczne 
         left_tangent_idx = left_tangent(convex_hull, point2_set[i])
         right_tangent_idx = right_tangent(convex_hull, point2_set[i])
