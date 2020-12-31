@@ -1,0 +1,897 @@
+% K. Kafara
+\documentclass[11pt]{article}
+\usepackage[margin=1.35in]{geometry}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{multirow}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage[polish]{babel}
+\usepackage[normalem]{ulem}
+\usepackage[backend=biber,style=alphabetic,sorting=ynt]{biblatex}
+\addbibresource{bibliography.bib}
+
+
+\useunder{\uline}{\ul}{}
+\pgfplotsset{compat=1.9}
+\theoremstyle{remark} \newtheorem{definition}{def.}
+\theoremstyle{definition} \newtheorem{twierdzenie}{tw.}
+\newcommand{\bold}[1]{\textbf{#1}}
+\newcommand{\bemph}[1]{\textbf{\emph{#1}}}
+\newcommand{\eq}{\, = \,}
+\newcommand{\apeq}{\, \approx \,}
+\newcommand{\miunit}{\, \frac{v \cdot s}{a \cdot m}}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\bunit}{\, \mu T}
+\newcommand{\iunit}{\, mA}
+
+
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\author{K. Kafara\\Ł. Czarniecki}
+\title{\textbf{Otoczka wypukła dla zbioru punktów w przestrzeni dwuwymiarowej}\\Dokumentacja projektu\\Algorytmy geometryczne}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
+
+
+\section{Informacje techniczne}
+
+\subsection{Budowa programu}
+
+Program złożony jest z następujących modułów: 
+
+\begin{itemize}
+    \item   \emph{lib} -- biblioteczny -- zawiera zbiór pomocniczych funkcji i struktur danych wykorzystywanych przez algorytmy.
+    \item   \emph{pure} -- algorytmy w \emph{czystej postaci} tj. nie posiadające części wizualizacyjnej. 
+    \item   \emph{vis} -- algorytmy wraz z kodem odpowiadającym za wizualizację
+\end{itemize}
+
+
+Poniżej przedstawiamy dokładny opis zawartości poszczególnych modułów. 
+
+\subsubsection{Moduł \emph{lib}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{geometric\_tool\_lab.py} -- narzędzie graficzne dostarczone w ramach przedmiotu \emph{Algorytmy geometryczne}
+    \item   \emph{getrand.py} -- zawiera funkcje generujące zbiory punktów różnych typów 
+    \item   \emph{sorting.py} -- zawiera implementację iteracyjnej wersji algorytmu \emph{QuickSort} wykorzystywaną m.in w algorytmie Grahama
+    \item   \emph{stack.py} -- zawiera klasę implementującą \emph{stos}
+    \item   \emph{util.py} -- zawiera szereg funkcji pomocniczych wykorzystywanych przez zaimplementowane algorytmy
+    \item   \emph{mytypes.py} -- zawiera definicje typów stworzone w celu zwiększenia czytelności kodu
+\end{enumerate}
+
+
+\subsubsection{Moduł \emph{pure}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{divide\_conq.py} -- implementacja algorytmu dziel i zwyciężaj
+    \item   \emph{graham.py} -- implementacja algorytmu Grahama
+    \item   \emph{increase.py} -- implementacja algorytmu przyrostowego
+    \item   \emph{jarvis.py} -- implementacja algorytmu Jarvisa
+    \item   \emph{lowerupper.py} -- implementacja algorytmu "górna-dolna"
+\end{enumerate}
+
+\subsubsection{Moduł \emph{vis}}
+
+Moduł zawiera w sobie następujące podmoduły:
+
+\begin{enumerate}
+    \item   \emph{divide\_conq\_vis.py} -- implementacja algorytmu dziel i zwyciężaj wraz z kodem tworzącym wizualizację
+    \item   \emph{graham\_vis.py} -- implementacja algorytmu Grahama wraz z kodem tworzącym wizualizację
+    \item   \emph{increase\_vis.py} -- implementacja algorytmu przyrostowego wraz z kodem tworzącym wizualizację
+    \item   \emph{jarvis\_vis.py} -- implementacja algorytmu Jarvisa wraz z kodem tworzącym wizualizację
+    \item   \emph{lowerupper\_vis.py} -- implementacja algorytmu "górna-dolna" wraz z kodem tworzącym wizualizację
+\end{enumerate}
+
+
+\subsection{Wymagania techniczne}
+
+\begin{enumerate}
+    \item   Python 3.9.0 64-bit lub nowszy
+    \item   Jupyter Notebook
+\end{enumerate}
+
+\subsection{Korzystanie z programu}
+
+\subsubsection{Uruchomienie wizualizacji}
+
+W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{program.ipynb},
+a następnie zapoznać się z zamieszczoną tam instrukcją. 
+
+
+\section{Oznaczenia i definicje}
+
+Na potrzeby dalszych wywodów przyjmujemy w tym miejscu szereg oznaczeń i definicji:
+
+
+
+
+\section{Problem}
+
+Wyznaczyć otoczkę wypukłą podanego zbioru punktów płaszczyzny dwuwymiarowej. 
+
+\section{Algorytmy}
+
+\subsection{Algorytm Grahama}
+
+    W celu opisania sposobu działania algorytmu Grahama, definiujemy następujacą relację $\preceq_Q$ określoną dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$ względem 
+    wybranego i ustalonego punktu odniesienia $Q$.
+
+    \begin{eqnarray*}
+        \label{eq:relacja-graham}
+        P_1 \preceq_Q P_2 \, \Leftrightarrow \, 
+        (\angle (P_1, Q, OX) < \angle (P_2, Q, OX)) 
+        \lor
+        (\angle (P_1, Q, OX) \eq \angle (P_2, Q, OX) \land d(P_1, Q) \leq d(P_2, Q)) 
+    \end{eqnarray*}
+
+    gdzie $d(P, Q)$ oznacza odległość od siebie dwóch dowolnych punktów płaszczyzny.
+
+    Tak zdefiniowana relacja jest liniowym porządkiem (zwrotna, antysymetryczna, przechodnia i spójna).
+
+    \subsubsection{Opis działania}
+
+    \begin{enumerate}
+        \item   Wyznaczamy najniższy punkt $Q$ wyjściowego zbioru (jeżeli jest wiele o tej samej rzędnej -- bierzemy ten o najmniejszej odciętej).
+        \item   Ustawiamy go jako pierwszy element zbioru. 
+        \item   Sortujemy pozostałe punkty względem relacji $\preceq_Q$.
+        \item   Usuwamy wszystkie, poza najbardziej oddalonym od Q, punkty leżące na półprostej $QP$, dla każdego $P$
+        \item   Kładziemy pierwsze 3 punkty zbioru na stos $S$. 
+        \item   Iterujemy kolejno po punktach z posortowanego zbioru nie będących na stosie:
+                Niech bieżącym punktem będzie P:
+
+                \begin{enumerate}
+                    \item   Dopóki $P$ nie jest po lewej stronie $S_{n-1}S_n$ wykonujemy (b)
+                    \item   Uswamy punkt ze stosu. 
+                    \item   Dodajemy $P$ na stos.
+                \end{enumerate}
+        \item Zwracamy zawartość stosu.
+    \end{enumerate}
+
+
+    \subsubsection{Szczegóły}
+
+    \begin{itemize}
+        \item   Najniższy punkt wyjściowego zbioru (punkt 1) wyznaczamy w czasie liniowym, iterując po kolejnych punktach zbioru. 
+        \item   Wszystkie punkty leżacej na jednej prostej, poza najbardziej oddalonym od $Q$ usuwamy w czasie liniowym w następujący sposób:
+                Iterując przez posortowaną tablicę, zaczynająć od indeksu $i := 1$, zapamiętujemy ostatni indeks na który wstawialiśmy $j$ (na początku $j := 1$).
+                Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe to $i := i+1$. Jeżeli nie są współliniowe to $P_i$ wpisujemy na pozycję $j$, a następnie $j := j + 1$. Następnie, 
+                w dalszej części algorytmu posługujemy się częścią tablicy $[0, \ldots, j - 1]$.
+    \end{itemize}    
+
+
+    \subsubsection{Złożoność}
+    
+    Operacją dominującą w algorytmie jest sortowanie -- realizowane w czasie $O(n \, lgn)$. Wybór punktu najniższego, redukcja punktów współlinowych oraz iterowanie (punkt 6, 
+    zauważmy, że każdy punkt zbioru wyjściowego jest obsługiwany co najwyżej 2 razy -- gdy jest dodawany do otoczki i gdy jest ewentualnie usuwany) są realizowane w
+    czasie $O(n)$. Algorytm Grahama ma zatem złożoność $O(n \, lgn)$.
+
+
+    \subsubsection{Kod}
+
+
+    \begin{lstlisting}[language=Python]
+def get_point_cmp(ref_point: Point, eps: float = 1e-7) -> Callable:
+    def point_cmp(point1, point2):
+        orient = orientation(ref_point, point1, point2, eps)
+        
+        if orient == -1:
+            return False
+        elif orient == 1:
+            return True
+        elif dist_sq(ref_point, point1) <= dist_sq(ref_point, point2):
+            return True
+        else:
+            return False
+
+    return point_cmp
+
+
+def graham(points: ListOfPoints) -> ListOfPoints:
+    istart = index_of_min(points, 1)
+
+    points[istart], points[0] = points[0], points[istart]    
+
+    qsort_iterative(points, get_point_cmp(points[0]))
+
+    i, new_size = 1, 1
+    while i < len(points):
+        while (i < len(points) - 1) \
+        and \
+        (orientation(points[0], points[i], points[i + 1], 1e-7) == 0):  
+            i += 1
+        
+        points[new_size] = points[i]
+        new_size += 1
+        i += 1
+    
+    s = Stack()
+    s.push(points[0])
+    s.push(points[1])
+    s.push(points[2])
+    
+    for i in range(3, new_size, 1):
+        while orientation(s.sec(), s.top(), points[i], 1e-7) != 1:
+            s.pop()
+
+        s.push(points[i])
+
+    return s.s[:s.itop+1]
+    \end{lstlisting}
+
+
+
+\subsection{Algorytm Jarvisa}
+    \subsubsection{Opis działania}
+    \begin{enumerate}
+        \item   Wyznaczamy najniższy punkt $Q$ wyjściowego zbioru (jeżeli jest wiele o tej samej rzędnej -- bierzemy ten o najmniejszej odciętej).
+        \item   Dodajemy $Q$ do zbioru punktów otoczki. 
+        \item   Przeglądamy punkty zbioru w poszukiwaniu takiego, który wraz z ostatnim punktem otoczki tworzy najmniejszy kąt skierowany względem ostatniej znanej
+                krawędzi otoczki. Dla pierwszego szukanego punktu, kąt namierzamy względem poziomu.
+        \item   Znaleziony punkt dodajemy do zbioru punktów otoczki, jeżeli jest różny od $Q$.
+        \item   Powtarzamy punkty 3 i 4 tak długo aż znalezionym punktem nie będzie $Q$.
+        \item   Zwracamy listę punktów otoczki. 
+    \end{enumerate}
+    \subsubsection{Szczegóły}
+    \begin{itemize}
+        \item   Najniższy punkt wyjściowego zbioru (punkt 1) wyznaczamy w czasie liniowym, iterując po kolejnych punktach zbioru.
+        \item   W celu wyznaczenia punktu wyspecyfikowanego w punkcie 3. nie obliczamy wartości odpowiedniego kąta. Zamiast tego, równoważnie, wyznaczamy punkt $P$, 
+                który wraz z ostatnim znanym punktem otoczki $P_0$ tworzy wektor $\vec{P_0P}$ dla którego wszystkie pozostałe punkty zbioru są po lewej stronie. Robimy 
+                to w czasie liniowym korzystając z znanych własności wyznacznika. 
+    \end{itemize}
+    \subsubsection{Złożoność}
+
+    Zauważmy, że jeżeli otoczka jest $k$ - elementowa, to główna pętla algorytmu (punkty 3--4) wykonuje się $k$-razy. Każdy krok pętli (znalezienie odpowiedniego punktu $P$) zajmuje czas liniowy. 
+    Pozostałe operacj w algorytmie zajmują co najwyżej czas liniowy. Zatem algrytm Jarvisa ma złożoność $O(nk)$.
+
+    \subsubsection{Kod}
+
+    \begin{lstlisting}[language=Python]
+def jarvis(points: ListOfPoints) -> ListOfPoints:
+EPS = 1e-8
+
+convex_hull = []
+
+start_idx = index_of_min(points, 1)
+
+convex_hull.append(start_idx)
+
+rand_idx = 0 if start_idx != 0 else 1
+
+prev = start_idx
+
+while True:
+    imax = rand_idx
+        
+    for i in range(len(points)):
+        if i != prev and i != imax:
+            orient = orientation(
+                        points[prev], 
+                        points[imax], 
+                        points[i], 
+                        EPS
+                     )
+            if orient == -1:
+                imax = i
+                
+            elif orient == 0 and \
+                 (dist_sq(points[prev], points[imax]) < dist_sq(points[prev], points[i])):
+                imax = i
+                
+    if imax == start_idx:
+        break;
+
+    convex_hull.append(imax)
+    
+    prev = imax
+
+return points[convex_hull]
+    \end{lstlisting}
+
+    W ostatniej linii algorytmu, korzystamy z możliwości bibliteki \emph{numpy}.\\
+
+
+\subsection{Algorytm górna-dolna}
+    \subsubsection{Opis działania}
+    \begin{enumerate}
+        \item   Sortujemy punkty rosnąco po odciętych (w przypadku rówych, mniejszy jest punkt o mniejszej rzędnej).
+        \item   Pierwsze dwa punkty z posortowanego zbioru wpisujemy do zbioru punktów otoczki górnej oraz dolnej.
+        \item   Iterujemy po zbiorze punktów zaczynając od $i = 2$ (trzeciego punktu), niech $P$ będzie bieżącym punktem:
+                \begin{enumerate}
+                    \item   Dopóki górna (dolna) otoczka ma co najmniej 2 punkty i $P$ nie znajduje się po prawej (lewej) stronie odcinka skierowanego utworzonego przez ostatniej
+                            dwa punkty otoczki (ostatni jest końcem odcinka), wykonujemy (b):
+                    \item   Usuwamy ostatni punkt z otoczki górej (dolnej).
+                    \item   Dodajemy $P$ do punktów otoczki górnej (dolnej).
+                \end{enumerate}
+        \item   Odwracamy kolejność wierzchołków w otoczce dolnej.
+        \item   Łączymy zbioru punktów otoczki górnej oraz dolnej.
+        \item   Zwracamy złączony zbiór punktów otoczki. 
+    \end{enumerate}
+
+    % \subsubsection{Szczegóły}
+
+    \subsubsection{Złożoność}
+    
+    Dominującą operacją w algorytmie jest sortowanie realizowane w czasie $O(n \, lgn)$. Każdy krok pętli (dla wyznaczania otoczki górnej oraz dolnej) zajmuje czas stały. Zauważmy, że podobnie do 
+    algorytmu Grahama każdy z punktów jest rozważany co najwyżej dwukrotnie -- w momencie dodania do otoczki i przy ewentualnym usunięciu ze zbioru punktów otoczki. Pozostałe operacje realizowane są w 
+    czasie liniowym. Zatem algorytm "górna-dolna" ma złożoność $O(n \, lgn)$.
+
+    \subsubsection{Kod}
+
+\begin{lstlisting}[language=Python]
+def lower_upper(point2_set: ListOfPoints) -> ListOfPoints:
+if len(point2_set) < 3: return None
+
+point2_set.sort(key = operator.itemgetter(0, 1))
+
+upper_ch = [ point2_set[0], point2_set[1] ] 
+lower_ch = [ point2_set[0], point2_set[1] ]
+
+for i in range( 2, len(point2_set) ):
+    while len(upper_ch) > 1 and orientation(upper_ch[-2], upper_ch[-1], point2_set[i]) != -1:
+        upper_ch.pop()
+
+    upper_ch.append(point2_set[i])
+
+for i in range(2, len(point2_set) ):
+    while len(lower_ch) > 1 and orientation(lower_ch[-2], lower_ch[-1], point2_set[i]) != 1:
+        lower_ch.pop()
+
+    lower_ch.append(point2_set[i])
+
+lower_ch.reverse()
+upper_ch.extend(lower_ch)
+
+return upper_ch
+\end{lstlisting}
+
+
+
+\subsection{Algorytm przyrostowy}
+    \subsubsection{Opis działania}
+    Ogólne sformułowanie algorytmu ma postać:
+    \begin{enumerate}
+        \item   Dodajemy pierwsze 3 punkty do zbioru punktów otoczki. 
+        \item   Iterujemy po pozostałych punktach. Niech $P$ będzie punktem bieżącym:
+                \begin{enumerate}
+                    \item   Jeżeli $P$ nie należy do wnętrza obecnie znanej otoczki wykonumejmy (b) oraz (c).
+                    \item   Znajdujemy styczne do obecnie znanej otoczki poprowadzone przez punkt $P$. 
+                    \item   Aktualizujemy otoczkę.
+                \end{enumerate}
+        \item   Zwracamy punkty otoczki. 
+    \end{enumerate}
+
+
+    Możemy go jednak sformułować inaczej, co pozwoli na uproszenie implementacji, przy zachowaniu takiego samego rzędu złożoności. 
+
+    \begin{enumerate}
+        \item   Sortujemy punkty rosnąco po odciętych (w przypadku rówych, mniejszy jest punkt o mniejszej rzędnej).
+        \item   Dodajemy pierwsze 3 punkty do zbioru punktów otoczki, w takiej kolejności, aby były podane w kolejności odwrotnej 
+                do ruchu wskazówek zegara. 
+        \item   Iterujemy po pozostałych punktach. Niech $P$ będzie punktem bieżącym: 
+                \begin{enumerate}
+                    \item   Znajdujemy styczne do obecnie znanej otoczki poprowadzone przez punkt $P$.
+                    \item   Aktualizujemy otoczkę. 
+                \end{enumerate}
+        \item   Zwracamy punkty otoczki.
+    \end{enumerate}
+
+
+    Dzięki wstępnemu posortowaniu puntków, omijamy konieczność testowania należenia $P$ do otoczki znanej w danym kroku algorytmu, ponieważ
+    biorąc kolejny punkt mamy gwarancję, że nie należy on do wcześniej znanej otoczki. 
+
+
+
+    \subsubsection{Szczegóły}
+        \subsubsection*{Wyznaczanie stycznych}
+
+        Styczne wyznaczamy w czasie logartymicznym względem liczby punktów należących do otoczki do której szukamy stycznych, 
+        wykonując poszukiwanie binarne elementów skrajnych (najmniejszego i największego) względem następującego porządku, 
+        określonego dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$, względem ustalonego punktu $Q$: \\
+        $P_1 >_Q P_2 \Leftrightarrow P_2$ znajduje się po lewej stronie odcinka skierowanego $QP_1$.
+
+        W tak określonym porządku elementem największym będzie prawy punkt styczności $P_{max}$, ponieważ wszystkie inne punkty otoczki 
+        znajdują się na lewo od prostej (stycznej) $QP_{max}$. Podobnie lewym punktem styczności będzie element najmniejszy 
+        w zadanym porządku $P_{min}$. \\
+
+        Wyznaczanie $P_{max}$ ($P_{min}$ wyznaczamy w sposób zupełnie analogiczny):\\
+        Wprowadźmy najpierw potrzebne oznaczenia: \\
+        $Q$ punkt zewnętrzny, przez który mają przechodzić styczne do otoczki.\\
+        Niech otoczka będzie dana w postaci ciągu punktów $P_0, \ldots, P_{k-1}$ ($P_k := P_0$) będących współrzędnymi kolejnych wierzchołków w kolejności przeciwnej
+        do ruchu wskazówek zegara.\\ 
+        Krawędź skierowaną otoczki $e_i$ definiujemy następująco: $e_i := P_iP_{i+1}$. \\
+        Krawędź $e_i := P_iP_{i+1}$ jest skierowana w górę $\Leftrightarrow$ $P_{i+1} >_Q P_i$.\\
+        Krawędź $e_i$ jest skierowana w dół, jeżeli nie jest skierowana w górę. 
+
+        \begin{enumerate}
+            \item   Jeżeli $P_0$ jest większy od swoich obudwu sąsiadów, to go zwracamy jako element
+                    największy. 
+            \item   Definujemy indeksy $l := 0$, $r := k$
+            \item   Dopóki nie znajdziemy elementu największego:
+                    \begin{enumerate}
+                    \item   Wyznaczamy indeks środkowego elementu $m := \left\lfloor \frac{l + k}{2} \right\rfloor$
+                    \item   Jezeli $P_m$ jest elementem największym:
+                            \begin{itemize}
+                                \item   Zwracamy $P_m$.
+                            \end{itemize}
+                    \item   Jeżeli $e_l$ jest skierowana w górę:
+                            \begin{enumerate}
+                                \item   Jeżeli $e_m$ jest skierowana w dół 
+                                        \begin{itemize}
+                                            \item $r := m$
+                                        \end{itemize}
+                                \item   W przeciwnym przypadku
+                                        \begin{enumerate}
+                                            \item   Jeżeli $P_l >_Q P_m$:
+                                                    \begin{itemize}
+                                                        \item $r := m$
+                                                    \end{itemize}
+                                            \item   W przeciwnym przypadku
+                                                    \begin{itemize}
+                                                        \item $l := m$
+                                                    \end{itemize}
+                                        \end{enumerate}
+                            \end{enumerate}
+                    \item   W przeciwnym przypadku:
+                            \begin{enumerate}
+                                \item   Jeżeli $e_m$ jest skierowana w górę:
+                                        \begin{itemize}
+                                            \item $l := m$
+                                        \end{itemize}
+                                \item   W przeciwnym przypadku: 
+                                        \begin{enumerate}
+                                            \item   Jeżeli $P_m >_Q P_l$:
+                                                    \begin{itemize}
+                                                        \item $r := m$
+                                                    \end{itemize}
+                                            \item   W przeciwnym przypadku:
+                                                    \begin{itemize}
+                                                        \item $l := m$
+                                                    \end{itemize}
+                                        \end{enumerate}
+                            \end{enumerate}
+                    \end{enumerate}
+        \end{enumerate}
+
+        % Przeanalizujmy powyższy algorytm. 
+
+        % Sprawdzamy najpierw czy $P_0$ nie jest szukanym punktem. Jest nim wtedy, gdy 
+    \subsubsection{Złożoność}
+        Posortowanie punktów zajmuje $O(n \, lgn)$. Każde wykonanie pętli zajmuje czas logarytmiczny względem liczebności otoczki
+        znanej w danej iteracji. Zatem złożoność algorytmu jest rzędu $O(n \, lgn)$\\
+
+    \subsubsection{Kod}
+
+\begin{lstlisting}[language=Python]
+def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    n = len(polygon)
+
+    if n < 3: return None
+
+    if orientation(polygon[0], polygon[1], point) == 1 and orientation(polygon[-1], polygon[0], point) == -1:
+        return 0
+    
+    left = 0
+    right = n
+    
+    while True:
+        mid = (left + right) // 2
+        
+        is_mid_down: bool = (orientation(polygon[mid], polygon[(mid + 1) % n], point) == 1)
+        
+        if is_mid_down and orientation(polygon[mid - 1], polygon[mid], point) == -1: 
+            return mid % n
+        
+        is_left_up: bool = (orientation(polygon[left % n], polygon[(left + 1) % n], point) == -1)
+        
+        if is_left_up:
+            if is_mid_down:
+                right = mid
+            else:
+                if orientation(point, polygon[left], polygon[mid]) == 1:
+                    right = mid
+                else:
+                    left = mid
+        else:
+            if not is_mid_down:
+                left = mid
+            else:
+                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+                    
+    
+def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
+    n = len(polygon)
+    
+    if n < 3: return None
+
+    left = 0
+    right = n
+    
+    if orientation(point, polygon[1], polygon[0]) == 1 and orientation(point, polygon[-1], polygon[0]) == 1:
+        return 0
+    
+    while True:
+        mid = (left + right) // 2
+
+        is_mid_down: bool = (orientation(point, polygon[mid % n], polygon[(mid + 1) % n]) == 1)
+        
+        if (not is_mid_down) and orientation(point, polygon[(mid - 1) % n], polygon[mid % n]) == 1:
+            return mid % n
+        
+        is_left_down: bool = (orientation(point, polygon[left], polygon[(left + 1) % n]) == 1)
+        
+        if is_left_down:
+            if not is_mid_down:
+                right = mid
+            else:
+                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+        else:
+            if is_mid_down:
+                left = mid
+            else:
+                if orientation(point, polygon[left % n], polygon[mid % n]) == 1:
+                    right = mid
+                else:
+                    left = mid
+
+        
+def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
+    if len( point2_set ) < 3: return None
+    
+    point2_set.sort(key = operator.itemgetter(0, 1))
+    
+    convex_hull = point2_set[:3]
+
+    if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
+        convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
+    
+    for i in range(3, len( point2_set )):
+        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
+        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
+        
+        left_tangent_point = convex_hull[left_tangent_idx]
+        right_tangent_point = convex_hull[right_tangent_idx]        
+
+        deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
+
+        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
+            step = 0
+        else: 
+            step = -1
+            
+        left = (left_tangent_idx + 1) % len(convex_hull)
+        
+        while convex_hull[left] != right_tangent_point:
+            convex_hull.pop(left)
+            left = (left + step) % len(convex_hull)
+            
+        convex_hull.insert(left, point2_set[i])
+
+    return convex_hull
+\end{lstlisting}
+
+\subsection{Algorytm dziel i zwyciężaj}
+    \subsubsection{Opis działania}
+    \subsubsection{Szczegóły}
+    \subsubsection{Złożoność}
+    \subsubsection{Kod}
+
+
+
+\subsection{Algorytm Chana}
+    \subsubsection{Opis działania}
+    Główna część algorytmu Chana składa się  na dwie częście:
+    \begin{enumerate}
+        \item   Pierwsza, która składa się  na :
+                \begin{itemize}
+                    \item Podział zbioru punktów Q na podzbiory Q_i o w miarę równych
+                            ilościach punktów w nich zawartych, z czego żaden nie 
+                            zawiera więcej niż dane m. 
+                    \item Wyznaczenie otoczek C_i
+                \end{itemize}
+        \item   Druga polega na wykonaniu algorytmu na wzór Jarvisa, tylko na 
+                otoczkach. Dokładniej mówiąc:
+                \begin{itemize}
+                    \item   Startujemy z najniższy wierzchołkeim z całego zbioru Q
+                            i dodajemy go do finalnej otoczki jako pierwszy wierzchołek.
+                    \item   Dla każdego punktu należącego do otoczki, możemy znaleźć
+                            jego następnego sąsiada w otoczce idąc w kolejności przeciwnej
+                            do ruchu wskazóek zegara. 
+                            Aby to zrobić należy wybrać spośród zbioru punktów utworzonego z:
+                            punktów tworzących prawą styczną z otoczkami C_i dla rozważanego
+                            wierzchołka, kolejnego punktu podotoczki do której dany punkt należy
+                            taki wierzchołek , że wszystkie inne wierzchołki z tego zbioru są
+                            na lewo od niego.
+                    \item   W ten sposób wyznaczamy kolejne wierzchołki otoczki, Dopóki
+                            następnym wierzchołkiem otoczki nie jest jej pierwszy punkt.
+                            Wtedy otoczka jest pełna i kończymy algorytm.
+                \end{itemize}
+    
+        \item   Zwracamy punkty otoczki. 
+    \end{enumerate}
+    Jednakże nadżędną istotą powyższego algorytmu jest to, że wykona się on w drugiej
+    części w co najwyżej m krokach(dany rozmiar podzbioru). Inaczej mówiąc m musi być
+    większe bądź równe(w idealnym przypadku) liczbie punktów należących do otoczki k.
+    Jeśli wykonamy m kroków i wciąż nie mamy otoczki, to przerywamy algorytm. I 
+    próbujemy z większym m. Aby nie popsóć złożoności dużą ilością powtórzeń głównej
+    części algorytmu najlepiej za każdym razem parametr m podnosić do kwadratu. W przypadku
+    gdy m>=n po prustu za m przyjmujemy n. Wtedy algorytm chana sprowadza się do algorytmu 
+    Grahama.
+    \subsubsection{Szczegóły}  
+    \begin{itemize}
+        \item   Najniższy punkt zbioru wyznaczamy w czasie liniowym. W trakcie podziału zpewniamy, że znajdzie się on w otoczce C_0 w indeksie 0.
+        \item   Wszystkie punkty leżacej na jednej prostej, poza najbardziej oddalonym od $Q$ usuwamy w czasie liniowym w następujący sposób:
+                Iterując przez posortowaną tablicę, zaczynająć od indeksu $i := 1$, zapamiętujemy ostatni indeks na który wstawialiśmy $j$ (na początku $j := 1$).
+                Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe to $i := i+1$. Jeżeli nie są współliniowe to $P_i$ wpisujemy na pozycję $j$, a następnie $j := j + 1$. Następnie, 
+                w dalszej części algorytmu posługujemy się częścią tablicy $[0, \ldots, j - 1]$.
+    \end{itemize}     
+    \subsubsection{Złożoność}
+    Złożoność głównej części algorytmu.
+    \begin{itemize}
+        \item Złożoność pierwsszej części składa się na :
+                \begin{itemize}
+                    \item   Podział zbioru punktów na podzbiory O(n);
+                    \item   Wyznaczenie otoczek dla podzbiorów. Mamy ceil(n/m) podzbiorów
+                            rozmiaru m, dla każdego z nich wyznaczamy otoczkę algorytmem Grahama.
+                            Algorytm Grahama działa O(nlog(n)). Więc łącznie mamy O(ceil(n/m)*mlog(m))=
+                            O(nlog(m)).
+                \end{itemize}
+                Łącznie dla pierewszej części mamy O(nlog(m)), gdzie m jest wybranym maksymalnym
+                 rozmiarem podzbiorów.
+
+        \item Złożoność drugiej części składa się na :
+                 \begin{itemize}
+                     \item   Wyznaczenie następnego punktu dla każdego punktu z otoczki głównej o rozmiarze k ;
+                     \item   Wyznacznie następnego punktu składa się na wyznaczenie dla każdej z m podotoczek
+                            stycznej do tej podotoczki. Styczną wyznaczamy binary searchem w czasie O(log(m))
+                            (otoczka C_i ma conajwyżej m wierzchołków). Otoczek jest ceil(n/m), a zatem czas
+                            wyznaczenia kolejngo wierzchołka otoczki to O(ceil(n/m)log(m)).    
+                 \end{itemize}
+                 Zakładając , że liczba wierzchołków otoczki k<=m(gdy k>m przerywamy algorytm, więc złożoność pozostaje ta sama),
+                  to ostatecznie mamy złożoność dla drugiej części rzędu : O(k*ceil(n/m)*log(m)) = O(nlog(m)) w idealnym przypadku O(nlog(k))
+    \end{itemize}
+
+    Cała złożoność głównej części algorytmu, to O(nlog(m)) , gdzie m jest wybraną wiellkości podzbioru.
+    Złożonośc algorytmu dla próbowania algorytmu z kolejnymi m postaci 2^2^m dla m>=1, to:
+    Iteracja zako
+
+
+    \subsubsection{Kod}
+\begin{lstlisting}[language=Python]
+from divide import *
+from det import *
+from tangentBothsides import *
+
+def compr(p, q, current,
+          accur=10 ** (-6)):  # jezeli p jest po prawej  odcinka [current,q] - jest 'wiekszy', to zwracamy 1
+    if det(current, p, q) > accur:
+        return -1
+    elif det(current, p, q) < accur:
+        return 1
+    else:
+        return 0
+
+
+def nextvert(C, curr):  # dla danego punktu wspolzednymi z Q[i][j] jesli jest to punkt nalezacy do finalnej otoczki, to
+    # zwraca nastepny punkt nalezacy do finalnej otoczki zadanego w takich samych wspolzednych Q[nxt[0]][nxt[1]]
+    i, j = curr
+    nxt = (i, (j + 1) % len(C[i]))
+    for k in range(len(C)):
+        t = tangent(C[i][j], C[k])
+        if t != None and k != i and compr(C[nxt[0]][nxt[1]], C[k][t], C[i][j]) > 0 and (k, t) != (curr):
+            nxt = (k, t)
+
+    return nxt
+
+
+def chanUtil(points, m):
+    Q = divide(points, m)
+    C = []
+    for i in range(len(Q)):
+        C.append(Graham(Q[i]))
+
+    curr = (0, 0)
+    ans = []
+    i = 0
+    while i < m:
+        ans.append(C[curr[0]][curr[1]])
+        if nextvert(C, curr) == (0, 0):
+            return ans
+        curr = nextvert(C, curr)
+        i += 1
+
+    return None
+
+
+def chan(points):
+    n = len(points)
+    m = 4
+    hoax = None
+    while hoax == None:
+        hoax = chanUtil(points, m)
+        m = min(n, m * m)
+
+    return hoax
+
+\end{lstlisting}
+    
+
+\subsection{Algorytm QuickHull}
+    \subsubsection{Opis działania}
+    Algorytm QuickHull polega na rekurencyjnym wyznaczaniu kolejnych punktów otoczki. 
+    \begin{enumerate}
+        \item   Algorytm rozpoczynamy od wyznaczenie dwóch punktów skrajnych a,b - tj. o najmniejszej
+                i największej współżędnej x-owej.
+        \item   Następnie uruchamiamy funkcję rekurencyjnego znajdowania łuku należącego do otoczki
+                między danym punktami należącymi do tej otoczki p,q  na prawo od odcinka |p,q|.
+                Otoczką jest suma punktów a, wyniku działania funkcji rekurencyjnej dla odcinka |a,b|,b
+                oraz wyniku działania funkcji rekurencyjnej dla |b,a|
+        \item   Funkcja rekurencyjnego wyznaczenia łuku należącego do otoczki między punktami p i q polega na :
+                \begin{itemize}
+                    \item   Wyznaczeniu nabardziej oddalonego punktu na prawo od |p,q| jeśli są punkty po prawej.
+                    \item   Jeśli nie ma takich punktów, to takiego łuku nie ma i zwracamy pustą tablicę. 
+                    \item   W przeciwnym przypadku p,q należą do otoczki, to wyznaczony punkt skrajny r 
+                            musi należeć do otoczki. 
+                    \item   Skoro p,k,r należy do otoczki, to wszystkie wierzchołki wewnątrz trójkąta pkr napewno do najmniej
+                            nie należą - usuwamy je.
+                    \item   Szukany łuk, to suma działania tej samej funkcji dla punktów p,r, punktu r , oraz
+                            wyniku tej funkcji dla punktów r,q w zadanej kolejności.
+                    \item   Na koniec zwracamy wyznaczony w ten sposób łuk.
+    \end{enumerate}
+    \subsubsection{Szczegóły}  
+    \begin{itemize}
+        \item   Rozpatrywane punkty p,q,r zawsze są podane w kolejności przeciwnej do ruchu wskazówek zegara.
+                Aby usunąć punkty wewnątrz takich trójkątów należy dla każdego punktu z rozważanych sprawdzić,
+                należy do danego trójkąta. 
+        \item   Sprawdzenie, czy dany punkt należy do trójkąta pkr wykonujemy poprzez sprawdzenie, czy dla każdego
+                z odcinków pr, rq, qp dany punkt znajduje się na lewo od tego odcinka, bądź jest z nim współliniowy.
+        \item   Porównywanie odległości punktów r znajdujących się na prawo od odcinka pq wykonujemy za pomocą
+                wyznacznika. Jest on wprostproporcjonlny do pola trójkąta rozpiętego na wektorach pq,pr. Ponieważ 
+                odcinek pq ma stałą długośćdla każdego r, to wyznacznik ten jest wprostproporcjonalny do wysokości tego
+                trójkąta opuszczonej na bok pq - odległości punktów.
+    \end{itemize}     
+    \subsubsection{Złożoność}
+    Złożoność głównej części algorytmu.
+    \begin{itemize}
+        \item Złożoność pierwsszej części składa się na :
+                \begin{itemize}
+                    \item   Podział zbioru punktów na podzbiory O(n);
+                    \item   Wyznaczenie otoczek dla podzbiorów. Mamy ceil(n/m) podzbiorów
+                            rozmiaru m, dla każdego z nich wyznaczamy otoczkę algorytmem Grahama.
+                            Algorytm Grahama działa O(nlog(n)). Więc łącznie mamy O(ceil(n/m)*mlog(m))=
+                            O(nlog(m)).
+                \end{itemize}
+                Łącznie dla pierewszej części mamy O(nlog(m)), gdzie m jest wybranym maksymalnym
+                 rozmiarem podzbiorów.
+
+        \item Złożoność drugiej części składa się na :
+                 \begin{itemize}
+                     \item   Wyznaczenie następnego punktu dla każdego punktu z otoczki głównej o rozmiarze k ;
+                     \item   Wyznacznie następnego punktu składa się na wyznaczenie dla każdej z m podotoczek
+                            stycznej do tej podotoczki. Styczną wyznaczamy binary searchem w czasie O(log(m))
+                            (otoczka C_i ma conajwyżej m wierzchołków). Otoczek jest ceil(n/m), a zatem czas
+                            wyznaczenia kolejngo wierzchołka otoczki to O(ceil(n/m)log(m)).    
+                 \end{itemize}
+                 Zakładając , że liczba wierzchołków otoczki k<=m(gdy k>m przerywamy algorytm, więc złożoność pozostaje ta sama),
+                  to ostatecznie mamy złożoność dla drugiej części rzędu : O(k*ceil(n/m)*log(m)) = O(nlog(m)) w idealnym przypadku O(nlog(k))
+    \end{itemize}
+
+    Cała złożoność głównej części algorytmu, to O(nlog(m)) , gdzie m jest wybraną wiellkości podzbioru.
+    Złożonośc algorytmu dla próbowania algorytmu z kolejnymi m postaci 2^2^m dla m>=1, to:
+    Iteracja zako
+
+
+    \subsubsection{Kod}
+\begin{lstlisting}[language=Python]
+
+def furthest(a, b, considering):
+    n = len(considering)
+    i = 0
+    ans = None
+    while i < n:
+        if det(a, b, considering[i]) < 0:  # rozwazany wierzcholek jest po prawej stronie ab
+            if ans == None or det(a, b, considering[i]) < det(a, b,
+                                                              ans):  # |det(a,b,c)| = 1/2|ab|*h, gdzie h jest wysokoscia z c na ab
+                ans = considering[i]
+        i += 1
+    return ans
+
+
+def insideTriangle(a, b, c, i):
+    if det(a, b, i) > 0 and det(b, c, i) > 0 and det(c, a, i) > 0:
+        return True
+    return False
+
+
+def removeInner(a, b, c, considering):
+    new=[]
+    for i in considering:
+        if not insideTriangle(a, b, c, i):
+            new.append(i)
+    considering.clear()
+    considering+=new
+
+def quickHullUtil(a, b, considering):
+    if len(considering) == 0:
+        return []
+
+    c = furthest(a, b, considering)
+    if c == None:
+        return []
+    considering.remove(c)
+
+    removeInner(a, c, b, considering)
+    return quickHullUtil(a, c, considering) +[c]+ quickHullUtil(c, b, considering)
+
+
+def quickHull(points):
+    a = min(points, key=lambda x: x[0])
+    b = max(points, key=lambda x: x[0])
+
+    considering = deepcopy(points)
+
+    considering.remove(a)
+    considering.remove(b)
+
+\end{lstlisting}
+
+
+    \medskip
+
+\printbibliography
+
+\end{document}  
