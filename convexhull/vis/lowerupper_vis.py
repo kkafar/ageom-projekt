@@ -165,6 +165,8 @@ def lower_upper_vis(point2_set: ListOfPoints) -> tuple[ListOfPoints, Plot]:
 
     # połączenie w odpowienid sposób list wynikowych i zwrócenie 
     lower_ch.reverse()
+    lower_ch.pop()
+    upper_ch.pop()
     upper_ch.extend(lower_ch)
 
     return upper_ch, plot

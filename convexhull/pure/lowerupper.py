@@ -38,6 +38,10 @@ def lower_upper(point2_set: ListOfPoints) -> ListOfPoints:
 
     # połączenie w odpowienid sposób list wynikowych i zwrócenie 
     lower_ch.reverse()
+    
+    # ściągamy powtarzające się wierzchołki
+    lower_ch.pop()
+    upper_ch.pop()
     upper_ch.extend(lower_ch)
 
     return upper_ch

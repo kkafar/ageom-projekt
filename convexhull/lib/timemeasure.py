@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 from typing import Any, Callable
 from pprint import pprint
 import numpy as np
-from lib.getrand import rand_point2_set
+from lib.getrand import rand_point2_set, rand_rect_points
 from pure.graham import graham
 from pure.jarvis import jarvis
 from pure.increase import increase_with_sorting
@@ -17,7 +17,7 @@ def get_exec_time(func: Callable, *args) -> float:
     """ Funkcja dokonująca pomiaru czasu działania funkcji func. 
     args - argumenty wywołania funkcji """
 
-    print('get_exec_time')
+    print(func, 'test')
     tstart = timer()
     func(*args)
     tstop = timer()
@@ -57,9 +57,9 @@ def exec_time_test(functions: list[Callable], point_generators: list[list[Callab
             
 if __name__ == '__main__':
     funcs = [graham, jarvis, increase_with_sorting, lower_upper, divide_conq]
-    pgener = [rand_point2_set]
-    args = [[1000, 0, 10]]
-    ntests = 10
+    pgener = [rand_point2_set, rand_rect_points]
+    args = [[500, 0, 10], [100, [[0, 0], [10, 0], [10, 10], [0, 10]]]]
+    ntests = 5
     
     exectimes = exec_time_test(funcs, pgener, args, ntests)
     
