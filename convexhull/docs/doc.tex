@@ -628,21 +628,49 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
 
 \subsection{Algorytm dziel i zwyciężaj}
     \subsubsection{Opis działania}
+    Prócz zbioru punktów, dodatkową daną wejściową dla algorytmu jest stała $k$ oznaczająca liczebość zbioru punktów, przy której przechodzimy w algorytmie 
+    rekurencyjnym do przypadku bazowego -- wyznaczamy otoczkę innym, wybranym algorytmem.
+    
+    Opisany algorytm jest algorytmem rekurencyjnym. Przed pierwszym wywołaniem rekurencyjnym należy zbiór punktów posortować 
+    rosnąco po odciętych (w przypadku równych, mniejszy jest punkty o mniejszej rzędnej). 
+   
+    Jest to standardowe zastosowanie metody "\emph{dziel i zwyciężaj}": 
     \begin{enumerate}
-        \item   Sortujemy punkty rosnąco po odciętych (w przypadku rówych, mniejszy jest punkt o mniejszej rzędnej).
+        \item   Dzielimy wyjściowy problem na mniejsze tak długo, aż znajdujemy się w przypadku któryi potrafimy rozwiązać elementarnie / w inny sposób.
+        \item   Łączymy kolejne rozwiązania częściowe w całość. 
+    \end{enumerate}
+
+
+    Popatrzmy na schemat działania:
+
+    \begin{enumerate}
+        \item   Jeżeli liczebność rozważanego zbioru jest mniejsza bądź równa danej stałej $k$, to:
+                \begin{enumerate}
+                    \item   Wyznaczamy otoczkę rozważanego zbioru punktów, za pomocą innej metody (np. innego algorytmu wyznaczania otoczki).
+                    \item   Zwracamy tak uzyskaną otoczkę.
+                \end{enumerate}
+        \item   W przeciwnym przypadku:
+                \begin{enumerate}
+                    \item   Wywołujemy się rekurencyjnie na zbiorze punktów o odciętych mniejszych od mediany.
+                    \item   Wywołujemy się rekurencyjnie na zbiorze punktóœ o odciętych większych bądź równych medianie.
+                    \item   Łączymy lewą i prawą otoczkę (pozyskane z wywołań rekurencyjnych) w jedną. 
+                    \item   Zwracamy tak uzyskaną otoczkę.
+                \end{enumerate}
     \end{enumerate}
     \subsubsection{Szczegóły}
+
+    \begin{itemize}
+        \item   Do wyznaczania otoczki w przypadku podstawowym wykorzystany został algortym Jarvisa, ponieważ dla $k << n$ ma on złożoność właściwie liniową.
+        \item   Sposób łączenia otoczek jest następujący: 
+                \begin{enumerate}
+                    \item  Wyznaczamy skrajny prawy punkt $L$ lewej otoczki oraz skrajny lewy $P$ punkt prawej otoczki. 
+                    \item  Dopóki poprzednik $P$  
+                \end{enumerate}
+    \end{itemize}
+
+
     \subsubsection{Złożoność}
     \subsubsection{Kod}
-
-
-
-    \subsection{Algorytm dziel i zwyciężaj}
-    \subsubsection{Opis działania}
-    \subsubsection{Szczegóły}
-    \subsubsection{Złożoność}
-    \subsubsection{Kod}
-
 
 
 \subsection{Algorytm Chana}
@@ -890,7 +918,6 @@ def quickHull(points):
     considering.remove(a)
     considering.remove(b)
 \end{lstlisting}
-
 
     \medskip
 

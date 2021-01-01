@@ -7,6 +7,7 @@ from lib.geometric_tool_lab import *
 from lib.util import *
 from lib.getrand import *
 from pure.graham import graham
+from pure.jarvis import jarvis
 from pprint import pprint
 import operator
 
@@ -30,7 +31,10 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     
 
     # górna styczna
-    while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1 or orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
+    while   orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1 \
+            or \
+            orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
+            
         # podnosimy punkt na prawej otoczce
         while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1:
             right_idx = (right_idx - 1) % right_ch_size
@@ -86,13 +90,14 @@ def merge_convex_hulls(left_convex_hull: list[Point], right_convex_hull: list[Po
     return merged_convex_hull 
 
 
-def divide_conq(point2_set: list[Point], k: int) -> Union[list[Point], None]:
+def divide_conq(point2_set: list[Point], k: int = 2) -> Union[list[Point], None]:
     if len(point2_set) < 3 or k <= 0: return None     
 
     
     def divide_conq_rec(point2_set: list[Point]) -> list[Point]:
         if len(point2_set) <= 2: return point2_set
-        elif len(point2_set) <= k: return graham(point2_set)
+        # elif len(point2_set) <= k: return graham(point2_set)
+        elif len(point2_set) <= k: return jarvis(point2_set)
     
         left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
         right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])
@@ -121,6 +126,21 @@ def main():
     convex_hull = divide_conq(points, 2)
     
     pprint(convex_hull)
+    
+    plot = Plot(scenes=[Scene(
+        points=[
+            PointsCollection(points, marker='.'),
+            PointsCollection(convex_hull, marker='s', color='r')
+        ],
+        lines=[
+            LinesCollection([
+                [ convex_hull[i], convex_hull[(i+1) % len(convex_hull)] ]
+                for i in range(len(convex_hull))
+            ], linestyle='--', color='r')
+        ]
+    )])
+    plot.draw()
+    
     
 
     

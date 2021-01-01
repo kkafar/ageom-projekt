@@ -18,7 +18,7 @@ def get_point_cmp(ref_point: Point, eps: float = 1e-7) -> Callable:
     def point_cmp(point1, point2):
         orient = orientation(ref_point, point1, point2, eps)
         
-        # jeżeli punkt q, leży po prawej stronie odcinka (p0, p) to q _le_ p ==> return True
+        # jeżeli punkt point2, leży po prawej stronie odcinka (ref_point, point1) to point2 _le_ point1 ==> False
         if orient == -1:
             return False
         elif orient == 1:
@@ -84,7 +84,7 @@ def graham(points: ListOfPoints) -> ListOfPoints:
     
     
 if __name__ == '__main__': 
-    points = rand_point2_set(20, 0, 10).tolist()
+    points = rand_point2_set(10000, 0, 10).tolist()
     
     pprint(points)
     
@@ -103,7 +103,7 @@ if __name__ == '__main__':
             LinesCollection([
                 [ convex_hull[i], convex_hull[(i+1) % len(convex_hull)] ]
                 for i in range(len(convex_hull))
-            ])
+            ], linestyle='--', color='r')
         ]
     )])
     

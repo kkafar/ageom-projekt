@@ -62,7 +62,7 @@ def jarvis(points: ListOfPoints) -> ListOfPoints:
     
     
 def main(): 
-    points = rand_point2_set(10, 0, 10)
+    points = rand_point2_set(10000, 0, 10)
     
     pprint(points)
     
@@ -77,6 +77,12 @@ def main():
         points=[
             PointsCollection(points),
             PointsCollection(convex_hull, marker='d', color='r')
+        ],
+        lines=[
+            LinesCollection([
+                [ convex_hull[i], convex_hull[(i+1) % len(convex_hull)] ]
+                for i in range(len(convex_hull))
+            ], linestyle='--', color='r')
         ]
     )])
     
