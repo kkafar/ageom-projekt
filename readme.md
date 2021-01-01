@@ -52,6 +52,16 @@ Testujemy dla n: 1000 - 20000, co 100
 W trakcie prezentacji należy przedstawić sposób działania programu
 
 
+1. [ ] Slajd tytułowy (podpis, co to za projekt, w ramach czego itd.)
+2. [ ] Przedstawienie problemu 
+3. [ ] Dowód na dolne ograniczenie czasowe problemu 
+
+
+3. [ ] Odnoście każdego algorytmu:
+    1. [ ] ma być pełen opis
+    2. [ ] po opisie, slajdy z animacją (na każdym slajdzie jedna klatka z działania algorytmu na jakimś małym zbiorze punktów)
+4. [ ] Bibliografia
+
 ## Wszędzie dodać bibliografię i się podpisać 
 
 # Program

@@ -194,7 +194,7 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
     return merged_convex_hull 
 
 
-def divide_conq_viz(point2_set: list[Point], k: int) -> Union[tuple[list[Point], Plot], None]:
+def divide_conq_vis(point2_set: list[Point], k: int) -> Union[tuple[list[Point], Plot], None]:
     if len(point2_set) < 3 or k <= 0: return None     
 
     plot = Plot(scenes=[Scene(points=[PointsCollection(point2_set)])])
@@ -352,7 +352,7 @@ def main():
     print("--" * 10)
 
 
-    convex_hull, plot = divide_conq_viz(points, 5)
+    convex_hull, plot = divide_conq_vis(points, 5)
     
     pprint(convex_hull)
     

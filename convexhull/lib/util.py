@@ -4,6 +4,10 @@ import json
 import simplejson
 from typing import Literal, Union
 from lib.mytypes import ListOfPoints, ListOfSegments, Point, Segment
+from random import randint
+import matplotlib.colors as mcolors
+import math
+import numpy as np
 
 
 
@@ -156,3 +160,96 @@ def dist_sq(p1, p2):
 def swap_points(p, q):
     """ Zamienia współrzędne dwóch punktów """
     p[0], p[1], q[0], q[1] = q[0], q[1], p[0], p[1]
+
+    
+    
+def divide(points,m): #dzieli zbior punktow na w miarae rowne podzbiory o rozmiarze m lub m-1
+    n=len(points)
+    for i in range(1,n):#gwarantuje, ze w pierwszym zbiorze Qi pierwszy element jest najnizszy, czyli nalezy do otoczki ostatecznej
+        if points[i][1] < points[0][1]:
+            buf=points[i]
+            points[i] = points[0]
+            points[0]=buf
+            
+    k=math.ceil(n/m)
+    Q=[[] for i in range(k)]
+    i=0
+    while i<n:
+        for j in range(k):
+            if i==n:
+                break
+            Q[j].append(points[i])
+            i+=1
+    if len(Q[0]) > m:
+        return None
+            
+    return Q
+
+def makeSheaf(Points): #laczy punkty w kolejnosci jakiej sa podane
+    Sheaf=[]
+    for i in range(len(Points)-1):
+        Sheaf.append([Points[i],Points[i+1]])
+    return Sheaf
+
+def makeFullSheaf(Points): #laczy punkty w kolejnosci jakiej sa podane, dodatkowo domyka cylk
+    Sheaf=[]
+    for i in range(len(Points)-1):
+        Sheaf.append([Points[i],Points[i+1]])
+    Sheaf.append([Points[len(Points)-1],Points[0]])
+    return Sheaf
+
+def length(v):
+     return np.sqrt((v[1][0]-v[0][0])**2+(v[1][1]-v[0][1])**2)
+
+def det(a,b,c):
+    return a[0]*b[1]-a[0]*c[1]-b[0]*a[1]+b[0]*c[1]+c[0]*a[1]-c[0]*b[1]
+
+def tangent(p, Q, accur=0):  # Q-zbior punktow w formie otoczki
+    # wykorzystujemy binary search na otoczce - jesli dany wierzcholek jest po prawej stronie punktu tworzacej styczna
+    # lewostronna z p, 
+    ln = len(Q)
+
+    def tangetUtil(p, Q, l, r):
+        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            return None
+
+        mid = (l + r) // 2
+        if det(Q[0], Q[1], p) > 0 and det(Q[ln - 1], Q[0], p) > 0:
+            if (det(Q[0], p, Q[mid]) < 0) or (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and \
+                                              det(p, Q[mid], Q[(mid - 1) % ln]) < 0) or \
+                    (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0):
+                return tangetUtil(p, Q, mid + 1, r)
+
+        else:
+            if det(Q[0], p, Q[mid]) >= 0 and \
+                    ((det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0) or \
+                     (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[
+                         (mid - 1) % ln]) < 0)):  # chyba nie potrzebne sprawdz na koncu
+                return tangetUtil(p, Q, mid + 1, r)
+
+        if det(p, Q[mid], Q[(mid + 1) % ln]) >= 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0 \
+                or (det(p, Q[mid], Q[(mid + 1) % ln]) == 0 and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
+                    (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
+
+            while (det(p, Q[mid], Q[(mid + 1) % ln]) == 0):
+                mid = (mid + 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
+            return mid
+
+        else:
+            return tangetUtil(p, Q, l, mid - 1)
+
+    
+    return tangetUtil(p, Q, 0, ln - 1)
+
+def randomColor():
+    return list(mcolors.CSS4_COLORS)[randint(0,len(list(mcolors.CSS4_COLORS))-1)]
+
+
+def compr(p,q,current,accur=10**(-6)):#jezeli p jest po prawej  odcinka [current,q] - jest 'wiekszy', to zwracamy 1
+        if det(current,p,q)>accur:
+            return -1
+        elif det(current,p,q)<accur:
+            return 1
+        else:
+            return 0
+        
