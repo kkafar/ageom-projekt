@@ -748,7 +748,7 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
 
     Cała złożoność głównej części algorytmu, to $O(nlog(m))$ , gdzie $m$ jest wybraną wiellkości podzbioru.
     Złożonośc algorytmu dla próbowania algorytmu z kolejnymi $m$ postaci $2^{2^m}$ dla $m \ge 1$, to:
-    Iteracja zako
+    w takim razie złożoność można opisać wzorem \[ \sum_{t=1}^{$\lceil log log k \rceil$} 2^{-n} = 1 \]
 
     \subsubsection{Kod}
 \begin{lstlisting}[language=Python]
@@ -838,85 +838,69 @@ def chan(points):
                 z odcinków pr, rq, qp dany punkt znajduje się na lewo od tego odcinka, bądź jest z nim współliniowy.
         \item   Porównywanie odległości punktów r znajdujących się na prawo od odcinka pq wykonujemy za pomocą
                 wyznacznika. Jest on wprostproporcjonlny do pola trójkąta rozpiętego na wektorach pq,pr. Ponieważ 
-                odcinek pq ma stałą długośćdla każdego r, to wyznacznik ten jest wprostproporcjonalny do wysokości tego
+                odcinek pq ma stałą długość dla każdego r, to wyznacznik ten jest wprostproporcjonalny do wysokości tego
                 trójkąta opuszczonej na bok pq - odległości punktów.
     \end{itemize}     
     \subsubsection{Złożoność}
-    Złożoność głównej części algorytmu.
-    \begin{itemize}
-        \item Złożoność pierwsszej części składa się na :
-                \begin{itemize}
-                    \item   Podział zbioru punktów na podzbiory O(n);
-                    \item   Wyznaczenie otoczek dla podzbiorów. Mamy $\left\lceil(n/m)\right\rceil$ podzbiorów
-                            rozmiaru $m$, dla każdego z nich wyznaczamy otoczkę algorytmem Grahama.
-                            Algorytm Grahama działa $O(nlog(n))$. Więc łącznie mamy $O(\left\lceil(n/m)\right\rceil m log(m)) = O(nlog(m))$.
-                \end{itemize}
-                Łącznie dla pierewszej części mamy $O(nlog(m))$, gdzie m jest wybranym maksymalnym rozmiarem podzbiorów.
-
-        \item Złożoność drugiej części składa się na :
-                 \begin{itemize}
-                     \item   Wyznaczenie następnego punktu dla każdego punktu z otoczki głównej o rozmiarze k;
-                     \item   Wyznacznie następnego punktu składa się na wyznaczenie dla każdej z m podotoczek
-                            stycznej do tej podotoczki. Styczną wyznaczamy z pomocą algorytmu wyszukiwania binarnego w czasie $O(log(m))$
-                            (otoczka $C_i$ ma conajwyżej m wierzchołków). Otoczek jest $\left\lceil(n/m)\right\rceil$, a zatem czas
-                            wyznaczenia kolejngo wierzchołka otoczki to $O(\left\lceil(n/m)\right\rceil log(m))$.    
-                 \end{itemize}
-                 Zakładając , że liczba wierzchołków otoczki k<=m(gdy k>m przerywamy algorytm, więc złożoność pozostaje ta sama),
-                  to ostatecznie mamy złożoność dla drugiej części rzędu : O(k*ceil(n/m)*log(m)) = O(nlog(m)) w idealnym przypadku O(nlog(k))
-    \end{itemize}
-
-    Cała złożoność głównej części algorytmu, to $O(nlog(m))$ , gdzie m jest wybraną wiellkości podzbioru.
-    Złożonośc algorytmu dla próbowania algorytmu z kolejnymi m postaci $2^{2^m}$ dla $m \ge 1$, to:
-    Iteracja zako
+    Pesymistyczna złożoność algorytmu to O(n^2) - gdy wszystkie punkty zbioru znajdują się w otoczce. Jendakże w średnim
+    przypadku złożoność wynosi O(nlogn)
     
 
     \subsubsection{Kod}
 \begin{lstlisting}[language=Python]
-def furthest(a, b, considering):
-    n = len(considering)
-    i = 0
-    ans = None
-    while i < n:
-        if det(a, b, considering[i]) < 0:  # rozwazany wierzcholek jest po prawej stronie ab
-            if ans == None or det(a, b, considering[i]) < det(a, b,
-                                                              ans):  # |det(a,b,c)| = 1/2|ab|*h, gdzie h jest wysokoscia z c na ab
-                ans = considering[i]
-        i += 1
-    return ans
-
-def insideTriangle(a, b, c, i):
-    if det(a, b, i) > 0 and det(b, c, i) > 0 and det(c, a, i) > 0:
-        return True
-    return False
-
-def removeInner(a, b, c, considering):
-    new=[]
-    for i in considering:
-        if not insideTriangle(a, b, c, i):
-            new.append(i)
-    considering.clear()
-    considering+=new
-
-def quickHullUtil(a, b, considering):
-    if len(considering) == 0:
-        return []
-
-    c = furthest(a, b, considering)
-    if c == None:
-        return []
-    considering.remove(c)
-
-    removeInner(a, c, b, considering)
-    return quickHullUtil(a, c, considering) +[c]+ quickHullUtil(c, b, considering)
-
-def quickHull(points):
-    a = min(points, key=lambda x: x[0])
-    b = max(points, key=lambda x: x[0])
-
-    considering = deepcopy(points)
-
-    considering.remove(a)
-    considering.remove(b)
+    from copy import deepcopy
+    from lib.det import *
+    
+    def furthest(a, b, considering):
+        n = len(considering)
+        i = 0
+        ans = None
+        while i < n:
+            if det(a, b, considering[i]) < 0:  # rozwazany wierzcholek jest po prawej stronie ab
+                if ans == None or det(a, b, considering[i]) < det(a, b,
+                                                                  ans):  # |det(a,b,c)| = 1/2|ab|*h, gdzie h jest wysokoscia z c na ab
+                    ans = considering[i]
+            i += 1
+        return ans
+    
+    
+    def insideTriangle(a, b, c, i):
+        accur=10**(-7)
+        if det(a, b, i) > -accur and det(b, c, i) > -accur and det(c, a, i) > -accur:
+            return True
+        return False
+    
+    
+    def removeInner(a, b, c, considering):
+        new=[]
+        for i in considering:
+            if not insideTriangle(a, b, c, i):
+                new.append(i)
+        considering.clear()
+        considering+=new
+    
+    def quickHullUtil(a, b, considering):
+        if len(considering) == 0:
+            return []
+    
+        c = furthest(a, b, considering)
+        if c == None:
+            return []
+        considering.remove(c)
+    
+        removeInner(a, c, b, considering)
+        return quickHullUtil(a, c, considering) +[c]+ quickHullUtil(c, b, considering)
+    
+    
+    def quickHull(points):
+        a = min(points, key=lambda x: x)
+        b = max(points, key=lambda x: x)
+    
+        considering = deepcopy(points)
+    
+        considering.remove(a)
+        considering.remove(b)
+    
 \end{lstlisting}
 
     \medskip
