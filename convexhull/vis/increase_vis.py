@@ -10,7 +10,90 @@ from lib.getrand import *
 from pprint import pprint
 import operator
 
-
+def rtangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    
+    if len(polygon) < 2: return None
+    
+    n = len(polygon)
+    
+    # indeksy wierzchołków do wyszukiwania binarnego
+    l, r, m = 0, n, None
+    
+    is_left_up, is_mid_down = None, None
+    
+    # polygon[0] po prawej polygon[1] oraz polygon[0] nie jest po lewej względem polygon[-1]
+    # a co gdy 3 punkty są współliniowe? 
+    if orientation(point, polygon[1], polygon[0]) == -1 and orientation(point, polygon[-1], polygon[0]) != 1:
+        return 0
+    
+    while True:
+        m = (l + r) // 2
+        
+        is_mid_down = (orientation(point, polygon[(m+1)%n], polygon[m]) == -1)
+        
+        if is_mid_down and orientation(point, polygon[(m-1)%n], polygon[m]) != 1:
+            return m
+    
+        is_left_up = (orientation(point, polygon[(l+1)%n], polygon[l]) == 1)
+        
+        if is_left_up:
+            if is_mid_down:
+                r = m
+            else:
+                if orientation(point, polygon[l], polygon[m]) == 1:
+                    r = m
+                else:
+                    l = m
+        else:
+            if not is_mid_down:
+                l = m
+            else:
+                if orientation(point, polygon[l], polygon[m]) == -1:
+                    r = m
+                else:
+                    l = m
+                    
+    
+def ltangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    if len(polygon) < 2: return None
+    
+    n = len(polygon)
+    
+    l, r, m  = 0, n, None
+    
+    is_left_down, is_mid_down = None, None
+    
+    
+    if orientation(point, polygon[-1], polygon[0]) == 1 and orientation(point, polygon[1], polygon[0]) != -1:
+        return 0
+    
+    while True:
+        m = (l + r) // 2
+        
+        is_mid_down = (orientation(point, polygon[(m+1)%n], polygon[m]) == -1) 
+        
+        if (not is_mid_down) and orientation(point, polygon[(m-1)%n], polygon[m]) == 1:
+            return m
+        
+        is_left_down = (orientation(point, polygon[(l+1)%n], polygon[l]) == -1)
+        
+        if is_left_down:
+            if not is_mid_down:
+                r = m
+            else:
+                if orientation(point, polygon[l], polygon[m]) == -1:
+                    r = m
+                else:
+                    l = m
+        else:
+            if is_mid_down:
+                l = m
+            else:
+                if orientation(point, polygon[l], polygon[m]) == 1:
+                    r = m
+                else:
+                    l = m
+                
 
 def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
     """ Zwraca punkt styczności (w formie indeksu) wielokąta WYPUKŁEGO polygon z prawą styczną poprowadzoną z punktu 
@@ -173,8 +256,10 @@ def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[Tuple[ListOfPoi
 
         # znajdujemy styczne 
         # znajdujemy styczne 
-        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
-        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
+        # left_tangent_idx = tangent_l(point2_set[i], convex_hull)
+        # right_tangent_idx = tangent_r(point2_set[i], convex_hull)
+        left_tangent_idx = ltangent(convex_hull, point2_set[i])
+        right_tangent_idx = rtangent(convex_hull, point2_set[i])
         
         if left_tangent_idx is None:
             print('nie wyznaczono lewej stycznej')
@@ -205,19 +290,26 @@ def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[Tuple[ListOfPoi
 
         deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
 
-        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
-            step = 0
-        else: 
-            step = -1
-            
-        left = (left_tangent_idx + 1) % len(convex_hull)
-        
-        while convex_hull[left] != right_tangent_point:
-            convex_hull.pop(left)
-            left = (left + step) % len(convex_hull)
 
-        convex_hull.insert(left, point2_set[i])
         
+        if deletion_side != 0:
+            if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
+                step = 0
+            else: 
+                step = -1
+                
+            left = (left_tangent_idx + 1) % len(convex_hull)
+            
+            while convex_hull[left] != right_tangent_point:
+                convex_hull.pop(left)
+                left = (left + step) % len(convex_hull)
+                
+            convex_hull.insert(left, point2_set[i])
+        else:
+            # point2_set[i] jest współliniowy z obydwoma punktami styczności oraz jest ponad nimi 
+            # wtedy w finalnym zbiorze powinny znaleźć się tylko 2 punkty - lewy punkt styczności oraz point2_set[i]
+            convex_hull = [point2_set[left_tangent_idx], point2_set[i]]
+            
         plot.add_scene(Scene(
             points=[
                 PointsCollection(point2_set, marker='.'),
@@ -246,7 +338,7 @@ def main():
     # file_path = 'test_data/points3.json'
     # save_file_path = 'test_data/convex_hull3.json'
     
-    point_count = 30
+    point_count = 20
     
     # points = rand_point2_set(point_count, 0, 10).tolist()
     points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
@@ -259,10 +351,10 @@ def main():
     convex_hull, plot = increase_with_sorting_vis(points)
     
     # save_points_to_json(save_file_path, convex_hull, indent = 4)    
+    plot.draw()
     
     pprint(convex_hull)
     
-    plot.draw()
 
 if __name__ == "__main__": 
     main()

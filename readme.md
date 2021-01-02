@@ -41,7 +41,7 @@
         5. [ ] Opis wizualizacji (ewentualny)
     4. [ ] Podsumowanie (tabelka z złożonościami)
     5. [ ] Porównanie czasów wykonania i złożonośći, wykresy (statystyki)
-        1. [ ] Dla każdego typu zbioru osobno\
+        1. [ ] Dla każdego typu zbioru osobno
 
 
 ### Typy zbiorów

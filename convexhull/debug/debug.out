@@ -29,91 +29,13 @@
  [0.0, 6.301448820593684],
  [9.406675399298997, 10.0]]
 ----------
-[[0.0, 1.2618428277299298],
- [0.0, 2.2262765870594126],
- [0.0, 4.2320137646722795]]
 obecnie znana otoczka
 [[0.0, 1.2618428277299298],
  [0.0, 2.2262765870594126],
  [0.0, 4.2320137646722795]]
 szukam lewej stycznej z [0.0, 4.71599699223607]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 4.71599699223607]
-znaleziono prawa styczna 1
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 4.71599699223607]]
-szukam lewej stycznej z [0.0, 6.076054742965853]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 6.076054742965853]
-znaleziono prawa styczna 0
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 6.076054742965853]]
-szukam lewej stycznej z [0.0, 6.301448820593684]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 6.301448820593684]
-znaleziono prawa styczna 0
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 6.301448820593684]]
-szukam lewej stycznej z [0.0, 7.077891069431434]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 7.077891069431434]
-znaleziono prawa styczna 0
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 7.077891069431434]]
-szukam lewej stycznej z [0.0, 8.426228031715517]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 8.426228031715517]
-znaleziono prawa styczna 0
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 8.426228031715517]]
-szukam lewej stycznej z [0.0, 9.246944131415045]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [0.0, 9.246944131415045]
-znaleziono prawa styczna 0
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [0.0, 9.246944131415045]]
-szukam lewej stycznej z [1.7196273067414336, 0.0]
-znaleziono lewa styczna 0
-szukam prawej stycznej z [1.7196273067414336, 0.0]
-znaleziono prawa styczna 1
-obecnie znana otoczka
-[[0.0, 1.2618428277299298], [1.7196273067414336, 0.0], [0.0, 9.246944131415045]]
-szukam lewej stycznej z [1.9345552584860337, 10.0]
-znaleziono lewa styczna 1
-szukam prawej stycznej z [1.9345552584860337, 10.0]
-znaleziono prawa styczna 2
-obecnie znana otoczka
+szukam stycznej do otoczki
 [[0.0, 1.2618428277299298],
- [1.7196273067414336, 0.0],
- [1.9345552584860337, 10.0],
- [0.0, 9.246944131415045]]
-szukam lewej stycznej z [3.028093792542148, 10.0]
-znaleziono lewa styczna 1
-szukam prawej stycznej z [3.028093792542148, 10.0]
-znaleziono prawa styczna 2
-obecnie znana otoczka
-[[0.0, 1.2618428277299298],
- [1.7196273067414336, 0.0],
- [3.028093792542148, 10.0],
- [1.9345552584860337, 10.0],
- [0.0, 9.246944131415045]]
-szukam lewej stycznej z [3.356159697202774, 0.0]
-tangent_l UTIL zwraca NONE
-[3.356159697202774, 0.0]
-[[0.0, 1.2618428277299298],
- [1.7196273067414336, 0.0],
- [3.028093792542148, 10.0],
- [1.9345552584860337, 10.0],
- [0.0, 9.246944131415045]]
-[0.0, 1.2618428277299298] [0.0, 9.246944131415045]
-nie znaleziono lewej stycznej
-szukam prawej stycznej z [3.356159697202774, 0.0]
-znaleziono prawa styczna 2
-Traceback (most recent call last):
-  File "/home/kkafara/Documents/studies/cs/3_term/ageom/projekt/convexhull/pure/increase.py", line 236, in <module>
-    main()
-  File "/home/kkafara/Documents/studies/cs/3_term/ageom/projekt/convexhull/pure/increase.py", line 221, in main
-    convex_hull = increase_with_sorting(points)
-  File "/home/kkafara/Documents/studies/cs/3_term/ageom/projekt/convexhull/pure/increase.py", line 181, in increase_with_sorting
-    left_tangent_point = convex_hull[left_tangent_idx]
-TypeError: list indices must be integers or slices, not NoneType
+ [0.0, 2.2262765870594126],
+ [0.0, 4.2320137646722795]]
+przechodzacej przez punkt  [0.0, 4.71599699223607]
