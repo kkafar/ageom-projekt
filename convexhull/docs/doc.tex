@@ -887,7 +887,8 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
 
     Cała złożoność głównej części algorytmu, to $O(nlog(m))$ , gdzie $m$ jest wybraną wiellkości podzbioru.
     Złożonośc algorytmu dla próbowania algorytmu z kolejnymi $m$ postaci $2^{2^m}$ dla $m \ge 1$, to:
-    w takim razie złożoność można opisać wzorem $ \sum_{t=1}^{ \lceil log log k \rceil } 2^{-n} = 1 $
+    w takim razie złożoność można opisać wzorem $ \sum_{t=1}^{\lceil log log k \rceil} O(n log (2^{2^t}))=
+    O(n*2^{1+{\lceil log log k \rceil}})=O(nlog k) $
 
     \subsubsection{Kod}
 \begin{lstlisting}[language=Python]
@@ -1039,7 +1040,6 @@ def chan(points):
     
         considering.remove(a)
         considering.remove(b)
-    
 \end{lstlisting}
 
     \medskip
