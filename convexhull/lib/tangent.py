@@ -1,4 +1,4 @@
-from lib.det import*
+from lib.det import *
 
 def tangent(p, Q, accur=0):  # Q-zbior punktow w formie otoczki
     # wykorzystujemy binary search na otoczce - jesli dany wierzcholek jest po prawej stronie punktu tworzacej styczna
