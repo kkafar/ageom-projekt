@@ -134,7 +134,8 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
     
     def divide_conq_rec(point2_set: List[Point]) -> List[Point]:
         if len(point2_set) <= 2: return point2_set
-        elif len(point2_set) <= k: return jarvis(np.array(point2_set))
+        elif len(point2_set) <= k: return graham(point2_set)
+        
     
         left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
         right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])

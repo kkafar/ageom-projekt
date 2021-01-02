@@ -2,6 +2,7 @@ from lib.divide import *
 from lib.det import *
 from lib.util import *
 from lib.tangent import *
+from pure.graham import graham
 
 def compr(p, q, current,
           accur=10 ** (-6)):  # jezeli p jest po prawej  odcinka [current,q] - jest 'wiekszy', to zwracamy 1
@@ -40,7 +41,7 @@ def chanUtil(points, m):
     Q = divide(points, m)
     C = []
     for i in range(len(Q)):
-        C.append(Graham(Q[i]))
+        C.append(graham(Q[i]))
 
     curr = (0, 0)
     ans = []
