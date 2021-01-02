@@ -13,129 +13,100 @@ from pprint import pprint
 import operator
 
 
-def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
-    """ Zwraca punkt styczności (w formie indeksu) wielokąta WYPUKŁEGO polygon z prawą styczną poprowadzoną z punktu 
-    nie należącego do wielokąta - point """
+def rtangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    print('szukam stycznej do otoczki')
+    pprint(polygon)
+    print('przechodzacej przez punkt ', point)
+    
+    if len(polygon) < 2: return None
     
     n = len(polygon)
+    
+    # indeksy wierzchołków do wyszukiwania binarnego
+    l, r, m = 0, n, None
+    
+    is_left_up, is_mid_down = None, None
+    
 
-    # if n < 3: return None
     
-    
-    # v_i > v_j <=> v_j znajduje się po lewej stronie odcinka point-v_i 
-    # mówimy, że krawędż e_i = v_i -> v_(i+1) jest skierowana w dół, jeżeli v_i > v_(i+1)\
-    
-    
-    # sprawdzamy czy v0 nie jest szukanym punktem styczności
-    succ_orient =  orientation(polygon[0], polygon[1], point)
-    pred_orient = orientation(polygon[-1], polygon[0], point)
-    dist_p0 = dist_sq(polygon[0], point)
-    if succ_orient == 1 and pred_orient == -1:
-        return 0
-    elif succ_orient == 0 and pred_orient == 0 and dist_p0 <= dist_sq(polygon[-1], point) and dist_p0 <= dist_sq(polygon[1], point):
-        return 0
-    elif succ_orient == 1 and pred_orient == 0:
+    # polygon[0] po prawej polygon[1] oraz polygon[0] nie jest po lewej względem polygon[-1]
+    # a co gdy 3 punkty są współliniowe? 
+    if orientation(point, polygon[1], polygon[0]) == -1 and orientation(point, polygon[-1], polygon[0]) != 1:
         return 0
     
-    left = 0
-    right = n
-    
-    
-    # punkt styczności zawsze istnieje
     while True:
-        mid = (left + right) // 2
+        m = (l + r) // 2
         
-        # sprawdzamy czy v_mid jest szukanym punktem styczności
-        is_mid_down: bool = (orientation(polygon[mid], polygon[(mid + 1) % n], point) == 1)
+        is_mid_down = (orientation(point, polygon[(m+1)%n], polygon[m]) == -1)
         
-        if is_mid_down and orientation(polygon[mid - 1], polygon[mid], point) == -1: 
-            return mid % n
-        
-        # jeżeli mid nie był punktem stycznośći, to musimy zdecydować w którym łańcuchu go szukamy
-        # [left, mid] czy [mid, right]
-        
-        left_orient = orientation(polygon[left % n], polygon[(left + 1) % n], point)
-        is_left_up: bool = (left_orient != 1)
+        if is_mid_down and orientation(point, polygon[(m-1)%n], polygon[m]) != 1:
+            return m
+    
+        is_left_up = (orientation(point, polygon[(l+1)%n], polygon[l]) == 1)
         
         if is_left_up:
             if is_mid_down:
-                # zawężamy się do [left, mid]
-                right = mid
-                
+                r = m
             else:
-                # jeżeli v_left > v_mid
-                if orientation(point, polygon[left], polygon[mid]) == 1:
-                    # zawężamy się do [left, mid]
-                    right = mid
+                if orientation(point, polygon[l], polygon[m]) == 1:
+                    r = m
                 else:
-                    # zawężamy się do [mid, right]
-                    left = mid
-        
+                    l = m
         else:
             if not is_mid_down:
-                left = mid
-                
+                l = m
             else:
-                # jeżeli v_mid > v_left
-                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
-                    right = mid
-                
+                if orientation(point, polygon[l], polygon[m]) == -1:
+                    r = m
                 else:
-                    left = mid
+                    l = m
                     
     
-def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
-    """ Zwraca punkt styczności (w formie indeksu) wielokąta WYPUKŁEGO polygon z LEWĄ styczną poprowadzoną z punktu 
-    nie należącego do wielokąta - point """
-
+def ltangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    print('szukam stycznej do otoczki')
+    pprint(polygon)
+    print('przechodzacej przez punkt ', point)
+    
+    
+    if len(polygon) < 2: return None
+    
     n = len(polygon)
     
-    if n < 3: return None
+    l, r, m  = 0, n, None
     
-
-    left = 0
-    right = n
+    is_left_down, is_mid_down = None, None
     
-    # v_i > v_j <=> v_j znajduje się po lewej stronie odcinka point-v_i 
-    # mówimy, że krawędż e_i = v_i -> v_(i+1) jest skierowana w dół, jeżeli v_i > v_(i+1)\
     
-    # sprawdzamy czy v0 nie jest szukanym punktem styczności
-    if orientation(point, polygon[1], polygon[0]) == 1 and orientation(point, polygon[-1], polygon[0]) == 1:
+    if orientation(point, polygon[-1], polygon[0]) == 1 and orientation(point, polygon[1], polygon[0]) != -1:
         return 0
     
-    # punkt stycznośći zawsze istnieje ==> pętla się zakończy
     while True:
-        mid = (left + right) // 2
-
-        is_mid_down: bool = (orientation(point, polygon[mid % n], polygon[(mid + 1) % n]) == 1)
+        m = (l + r) // 2
         
-        # sprawdzamy czy polygon[mid] nie jest szukanym punktem styczności
-        if (not is_mid_down) and orientation(point, polygon[(mid - 1) % n], polygon[mid % n]) == 1:
-            return mid % n
+        is_mid_down = (orientation(point, polygon[(m+1)%n], polygon[m]) == -1) 
         
-        # jeżeli polygon[mid] nie był punktem styczności 
+        if (not is_mid_down) and orientation(point, polygon[(m-1)%n], polygon[m]) == 1:
+            return m
         
-        is_left_down: bool = (orientation(point, polygon[left], polygon[(left + 1) % n]) == 1)
+        is_left_down = (orientation(point, polygon[(l+1)%n], polygon[l]) == -1)
         
         if is_left_down:
             if not is_mid_down:
-                right = mid
+                r = m
             else:
-                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
-                    right = mid
+                if orientation(point, polygon[l], polygon[m]) == -1:
+                    r = m
                 else:
-                    left = mid
-                    
+                    l = m
         else:
             if is_mid_down:
-                left = mid
+                l = m
             else:
-                if orientation(point, polygon[left % n], polygon[mid % n]) == 1:
-                    right = mid
+                if orientation(point, polygon[l], polygon[m]) == 1:
+                    r = m
                 else:
-                    left = mid
-                 
-        
+                    l = m
+                    
         
 def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
     if len( point2_set ) < 3: return None
@@ -148,8 +119,7 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     # bierzemy pierwsze 3 punkty i tworzymy z nich otoczkę
     convex_hull = point2_set[:3]
 
-    pprint(convex_hull)
-
+    # pprint(convex_hull)
 
     # musimy zapewnić, że wierzchołki wyjściowej otoczki są podane w kolejności przeciwnej do ruchu wskazówek zegara 
     if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
@@ -161,7 +131,8 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         pprint(convex_hull)
         print(f'szukam lewej stycznej z {point2_set[i]}')
         # left_tangent_idx = left_tangent(convex_hull, point2_set[i])
-        left_tangent_idx = tangent_l(point2_set[i], convex_hull)
+        # left_tangent_idx = tangent_l(point2_set[i], convex_hull)
+        left_tangent_idx = ltangent(convex_hull, point2_set[i])
         
         if left_tangent_idx is None:
             print('nie znaleziono lewej stycznej')
@@ -169,14 +140,15 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
             print(f'znaleziono lewa styczna {left_tangent_idx}')
             
         
-        print(f'szukam prawej stycznej z {point2_set[i]}') 
+        # print(f'szukam prawej stycznej z {point2_set[i]}') 
         # right_tangent_idx = right_tangent(convex_hull, point2_set[i])
-        right_tangent_idx = tangent_r(point2_set[i], convex_hull)
+        # right_tangent_idx = tangent_r(point2_set[i], convex_hull)
+        right_tangent_idx = rtangent(convex_hull, point2_set[i])
         
-        if right_tangent_idx is None:
-            print('nie znaleziono prawej stycznej')
-        else:
-            print(f'znaleziono prawa styczna {right_tangent_idx}')
+        # if right_tangent_idx is None:
+        #     print('nie znaleziono prawej stycznej')
+        # else:
+        #     print(f'znaleziono prawa styczna {right_tangent_idx}')
         # aktualizujemy otoczkę (TODO PYTANIE czy da się aktualizować otoczkę w czasie stałym?)
         left_tangent_point = convex_hull[left_tangent_idx]
         right_tangent_point = convex_hull[right_tangent_idx]        
@@ -208,7 +180,7 @@ def main():
     file_path = '../debug/increase_data.json'
     # save_file_path = 'test_data/convex_hull3.json'
     
-    point_count = 30
+    point_count = 3000
     
     # points = rand_point2_set(point_count, 0, 10).tolist()
     # points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
@@ -220,11 +192,14 @@ def main():
     
     # convex_hull = increase_with_sorting(points)
     
-    # save_points_to_json(save_file_path, convex_hull, indent = 4)    
+    # save_points_to_json(file_path, convex_hull, indent = 4)    
     
     plot = Plot(scenes=[Scene(points=[PointsCollection(points)])])
     
+    # plot.add_scene(Scene(points=[PointsCollection(convex_hull, color='r')]))
+    
     plot.draw()
+
     # pprint(convex_hull)
     
     
@@ -233,6 +208,26 @@ def main():
     # plot.draw()
 
 if __name__ == "__main__": 
-    main()
+#     obecnie znana otoczka
+# [[0.0, 0.028115298754645135],
+#  [0.01523045649619581, 0.0],
+#  [9.996688970065955, 0.0],
+#  [10.0, 0.0026406644727150486],
+#  [9.999950578062139, 10.0],
+#  [0.025116610956338326, 10.0],
+#  [0.0, 9.999951234026465]]
+# szukam lewej stycznej z [10.0, 0.038506319393473154]
+# znaleziono lewa styczna 3
+# obecnie znana otoczka
+# [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
+# szukam lewej stycznej z [10.0, 0.06725244544593334]
+# tangent_l zwraca None
+# [10.0, 0.06725244544593334]
+# [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
+# nie znaleziono lewej stycznej
 
+    point = [10.0, 0.038506319393473154]
+    ch = [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
+    a = tangent_l(point, ch)
+    print(a)
 
