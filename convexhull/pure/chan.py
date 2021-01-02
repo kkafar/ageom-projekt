@@ -1,6 +1,7 @@
-from divide import *
-from det import *
-from tangentBothsides import *
+from lib.divide import *
+from lib.det import *
+from lib.util import *
+from lib.tangent import *
 
 def compr(p, q, current,
           accur=10 ** (-6)):  # jezeli p jest po prawej  odcinka [current,q] - jest 'wiekszy', to zwracamy 1

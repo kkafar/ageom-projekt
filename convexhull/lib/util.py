@@ -11,7 +11,7 @@ import math
 import numpy as np
 import csv
 
-
+#costam
 
 def eq_eps(value: float, expected: float, eps: float = 1e-7) -> bool:
     """ == co do eps """
@@ -222,6 +222,9 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            # print(p)
+            # print(Q)
+            # print()
             return None
 
         mid = (l + r) // 2
@@ -260,6 +263,9 @@ def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            print(p)
+            print(Q)
+            print()
             return None
 
         mid = (l + r) // 2
