@@ -1,6 +1,7 @@
 from random import randint
 from copy import deepcopy
 from lib.det import *
+from lib.tangent import *
 from lib.util import *
 from pure.graham import graham
 import matplotlib.colors as mcolors
@@ -27,7 +28,7 @@ def nextvert(C, curr, plot=None, ans=None,
     i, j = curr
     nxt = (i, (j + 1) % len(C[i]))
     for k in range(len(C)):
-        t = tangent_r(C[i][j], C[k])
+        t = tangent(C[i][j], C[k])
         if t == None:
             continue
 
@@ -84,7 +85,7 @@ def chanUtil(points, m, plot=None):
     return None
 
 
-def chan(points, visual=False):
+def chan_vis(points, visual=False):
     plot = None
     if visual:
         plot = Plot(scenes=[Scene(points=[PointsCollection(deepcopy(points))])])

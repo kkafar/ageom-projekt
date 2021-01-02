@@ -9,6 +9,7 @@ from pprint import pprint
 import matplotlib.colors as mcolors
 import math
 import numpy as np
+import csv
 
 
 
@@ -69,6 +70,14 @@ def save_points_to_json(path: str, points: ListOfPoints, indent: int = None) -> 
 def load_points_from_json(path: str) -> None:
     with open(path, 'r') as file:
         return json.load(file)
+
+        
+def save_data_csv(path: str, data):
+    with open(path, 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        for row in data:
+            writer.writerow(row)
+    
         
     
 def intersection(segment1: Segment, segment2: Segment, eps: float = 1e-9) -> Union[Point, None]:

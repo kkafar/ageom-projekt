@@ -76,7 +76,7 @@ def quickHullUtil(a, b, considering, plot=None, hull=None):
     return quickHullUtil(a, c, considering) + [c] + quickHullUtil(c, b, considering)
 
 
-def quickHull(points, visual=False):
+def quickHull_vis(points, visual=False):
     a = min(points, key=lambda x: x)
     b = max(points, key=lambda x: x)
 
