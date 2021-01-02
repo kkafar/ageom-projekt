@@ -222,15 +222,9 @@ def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-<<<<<<< HEAD
             # print(p)
             # print(Q)
             # print()
-=======
-            print('tangent_l zwraca None')
-            print(p)
-            pprint(Q)
->>>>>>> 2f1a576b48109181f9d5228e5c80a94b04b8aa1b
             return None
 
         mid = (l + r) // 2
@@ -270,15 +264,9 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-<<<<<<< HEAD
             print(p)
             print(Q)
             print()
-=======
-            print('tangent_r zwraca None')
-            print(p)
-            pprint(Q)
->>>>>>> 2f1a576b48109181f9d5228e5c80a94b04b8aa1b
             return None
 
         mid = (l + r) // 2
