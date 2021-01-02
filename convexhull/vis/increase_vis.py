@@ -176,6 +176,15 @@ def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[Tuple[ListOfPoi
         left_tangent_idx = left_tangent(convex_hull, point2_set[i])
         right_tangent_idx = right_tangent(convex_hull, point2_set[i])
         
+        if left_tangent_idx is None:
+            print('nie wyznaczono lewej stycznej')
+            return None
+        
+        if right_tangent_idx is None:
+            print('nie wyznaczono prawej stycznej')
+            return None    
+        
+        
         plot.add_scene(Scene(
             points=[
                 PointsCollection(point2_set, marker='.'),
@@ -239,14 +248,15 @@ def main():
     
     point_count = 30
     
-    point_set = rand_point2_set(point_count, 0, 10).tolist()
-    # point_set = load_points_from_json(file_path)
+    # points = rand_point2_set(point_count, 0, 10).tolist()
+    points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
+    # points = load_points_from_json(file_path)
 
     # save_points_to_json(file_path, point_set, indent=4)
-    pprint(point_set)
+    pprint(points)
     print('-' * 10)
     
-    convex_hull, plot = increase_with_sorting_vis(point_set)
+    convex_hull, plot = increase_with_sorting_vis(points)
     
     # save_points_to_json(save_file_path, convex_hull, indent = 4)    
     

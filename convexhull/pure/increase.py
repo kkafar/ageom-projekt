@@ -143,10 +143,23 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     
     
     for i in range(3, len( point2_set )):
-        # znajdujemy styczne 
+        # znajdujemy styczne j
+        print('szukam lewej stycznej')
         left_tangent_idx = left_tangent(convex_hull, point2_set[i])
+        
+        if left_tangent_idx is None:
+            print('nie znaleziono lewej stycznej')
+        else:
+            print(f'znaleziono lewa styczna {left_tangent_idx}')
+            
+        
+        print('szukam prawej stycznej') 
         right_tangent_idx = right_tangent(convex_hull, point2_set[i])
         
+        if right_tangent_idx is None:
+            print('nie znaleziono prawej stycznej')
+        else:
+            print(f'znaleziono prawa styczna {right_tangent_idx}')
         # aktualizujemy otoczkę (TODO PYTANIE czy da się aktualizować otoczkę w czasie stałym?)
         left_tangent_point = convex_hull[left_tangent_idx]
         right_tangent_point = convex_hull[right_tangent_idx]        
@@ -175,14 +188,15 @@ def main():
     
     point_count = 30
     
-    point_set = rand_point2_set(point_count, 0, 10).tolist()
-    # point_set = load_points_from_json(file_path)
+    points = rand_point2_set(point_count, 0, 10).tolist()
+    points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
+    # points = load_points_from_json(file_path)
 
     # save_points_to_json(file_path, point_set, indent=4)
-    pprint(point_set)
+    pprint(points)
     print('-' * 10)
     
-    convex_hull = increase_with_sorting(point_set)
+    convex_hull = increase_with_sorting(points)
     
     # save_points_to_json(save_file_path, convex_hull, indent = 4)    
     

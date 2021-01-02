@@ -1,7 +1,7 @@
 """ K. Kafara """
 
 import json
-import simplejson
+# import simplejson
 from typing import Literal, Union
 from lib.mytypes import *
 from random import randint
@@ -62,12 +62,12 @@ def read_segments_from_json(path: str) -> ListOfSegments:
     
 def save_points_to_json(path: str, points: ListOfPoints, indent: int = None) -> None:
     with open(path, 'w') as file:
-        file.write(simplejson.dumps(points, indent = indent)) 
+        file.write(json.dumps(points, indent = indent)) 
     
 
 def load_points_from_json(path: str) -> None:
     with open(path, 'r') as file:
-        return simplejson.load(file)
+        return json.load(file)
         
     
 def intersection(segment1: Segment, segment2: Segment, eps: float = 1e-9) -> Union[Point, None]:
