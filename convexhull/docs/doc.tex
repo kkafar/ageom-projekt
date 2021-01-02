@@ -670,7 +670,156 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
 
 
     \subsubsection{Złożoność}
+    Łącznie we wszystkich złączeniach podzbiorów przechodzimy przez wszystkie wierzchąki zbioru dla każdego stopnia
+    podziału, dlatego złożoność wynosi (n log n) - jest log n podziałów i dla każdego wykonujemy połączenie.
+
     \subsubsection{Kod}
+    \begin{lstlisting}[language=Python]
+        from lib.mytypes import ListOfPoints
+        from lib.geometric_tool_lab import *
+        from lib.util import *
+        from lib.getrand import *
+        from pure.graham import graham
+        from pure.jarvis import jarvis
+        from pprint import pprint
+        import operator
+        
+        
+        def merge_convex_hulls(left_convex_hull: ListOfPoints, right_convex_hull: ListOfPoints) -> List[Point]:
+            """ Łączenie dwóch rozdzielnych otoczek. Otoczki muszą być zadane w formie wierzchołków podanych w kolejności przeciwnej do 
+            ruchu wskazówek zegara. Ponadto left_convex_hull powinno być lewą otoczką, a right_convex_hull prawą. """
+        
+            left_ch_size = len(left_convex_hull)
+            right_ch_size = len(right_convex_hull)
+        
+            # znajdujemy prawy skrajny punkt lewej otoczki 
+            left_ch_rightmost_idx = index_of_max(left_convex_hull, cmp_idx=0)
+            right_ch_leftmost_idx = index_of_min(right_convex_hull, cmp_idx=0)
+            
+            left = left_convex_hull[left_ch_rightmost_idx]
+            right = right_convex_hull[right_ch_leftmost_idx]
+            left_idx = left_ch_rightmost_idx
+            right_idx = right_ch_leftmost_idx
+            
+        
+            # górna styczna
+            left_flag, right_flag = True, True
+            while   orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) != -1 and right_flag\
+                    or \
+                    orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) != 1 and left_flag:
+        
+                left_flag, right_flag = False, False
+                
+                # podnosimy punkt na prawej otoczce
+                left_right_orient = orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size])
+                while left_right_orient != -1:
+                    if left_right_orient == 0 and dist_sq(left, right) >= dist_sq(left, right_convex_hull[(right_idx - 1) % right_ch_size]):
+                        right_flag = False
+                        break
+                    
+                    right_idx = (right_idx - 1) % right_ch_size
+                    right = right_convex_hull[right_idx]
+                    left_right_orient = orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size])
+                else:
+                    right_flag = True
+        
+                # podnosimy punkt na lewej otoczce
+                right_left_orient = orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size])
+                while right_left_orient != 1:
+                    if right_left_orient == 0 and dist_sq(right, left) >= dist_sq(right, left_convex_hull[(left_idx + 1) % left_ch_size]):
+                        left_flag = False
+                        break
+                    
+                    left_idx = (left_idx + 1) % left_ch_size
+                    left = left_convex_hull[left_idx]
+                    right_left_orient = orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size])
+                else:
+                    left_flag = True
+                    
+                    
+            upper_tangent_left_idx = left_idx
+            upper_tangent_right_idx = right_idx
+            
+            # dolna styczna
+            left = left_convex_hull[left_ch_rightmost_idx]
+            right = right_convex_hull[right_ch_leftmost_idx]
+            left_idx = left_ch_rightmost_idx
+            right_idx = right_ch_leftmost_idx
+                    
+            left_flag, right_flag = True, True
+            while   orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) != 1 and right_flag \
+                    or \
+                    orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) != -1 and left_flag:
+                        
+                left_flag, right_flag = False, False
+                
+                # opuszczamy punkt na prawej otoczce
+                left_right_orient = orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size])
+                while left_right_orient != 1:
+                    if left_right_orient == 0 and dist_sq(left, right) >= dist_sq(left, right_convex_hull[(right_idx + 1) % right_ch_size]):
+                        right_flag = False
+                        break
+                    
+                    right_idx = (right_idx + 1) % right_ch_size
+                    right = right_convex_hull[right_idx]
+                    left_right_orient = orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size])
+                else:
+                    right_flag = True
+                    
+                # opuszczamy punkt na lewej otoczce
+                right_left_orient = orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size])
+                while right_left_orient != -1:
+                    if right_left_orient == 0 and dist_sq(right, left) >= dist_sq(right, left_convex_hull[(left_idx - 1) % left_ch_size]):
+                        left_flag = False
+                        break
+                            
+                    left_idx = (left_idx - 1) % left_ch_size
+                    left = left_convex_hull[left_idx]
+                    right_left_orient = orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size])
+                else:
+                    left_flag = True
+                    
+                    
+            lower_tangent_left_idx = left_idx
+            lower_tangent_right_idx = right_idx
+            
+            merged_convex_hull = [ ]
+        
+            while upper_tangent_left_idx != lower_tangent_left_idx:
+                merged_convex_hull.append(left_convex_hull[upper_tangent_left_idx])
+                upper_tangent_left_idx = (upper_tangent_left_idx + 1) % left_ch_size
+            else:
+                merged_convex_hull.append(left_convex_hull[lower_tangent_left_idx])
+                
+                
+            while lower_tangent_right_idx != upper_tangent_right_idx:
+                merged_convex_hull.append(right_convex_hull[lower_tangent_right_idx])
+                lower_tangent_right_idx = (lower_tangent_right_idx + 1) % right_ch_size    
+            else:
+                merged_convex_hull.append(right_convex_hull[lower_tangent_right_idx])
+            
+            return merged_convex_hull 
+        
+        
+        def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]:
+            if len(point2_set) < 3 or k <= 0: return None     
+        
+            
+            def divide_conq_rec(point2_set: List[Point]) -> List[Point]:
+                if len(point2_set) <= 2: return point2_set
+                elif len(point2_set) <= k: return jarvis(np.array(point2_set))
+            
+                left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
+                right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])
+            
+                return merge_convex_hulls(left_convex_hull, right_convex_hull)
+            
+            point2_set.sort(key = operator.itemgetter(0, 1))    
+        
+            return divide_conq_rec(point2_set)
+
+    \end{lstlisting}
+
 
 
 \subsection{Algorytm Chana}
@@ -748,7 +897,8 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
 
     Cała złożoność głównej części algorytmu, to $O(nlog(m))$ , gdzie $m$ jest wybraną wiellkości podzbioru.
     Złożonośc algorytmu dla próbowania algorytmu z kolejnymi $m$ postaci $2^{2^m}$ dla $m \ge 1$, to:
-    w takim razie złożoność można opisać wzorem \[ \sum_{t=1}^{$\lceil log log k \rceil$} 2^{-n} = 1 \]
+    w takim razie złożoność można opisać wzorem \[ \sum_{t=1}^{$\lceil log log k \rceil$} O(n log (2^2^t))=
+    O(n*2^{1+{$\lceil log log k \rceil$}})=O(nlog k)
 
     \subsubsection{Kod}
 \begin{lstlisting}[language=Python]
@@ -843,7 +993,7 @@ def chan(points):
     \end{itemize}     
     \subsubsection{Złożoność}
     Pesymistyczna złożoność algorytmu to O(n^2) - gdy wszystkie punkty zbioru znajdują się w otoczce. Jendakże w średnim
-    przypadku złożoność wynosi O(nlogn)
+    przypadku złożoność wynosi O(nlogn).
     
 
     \subsubsection{Kod}
