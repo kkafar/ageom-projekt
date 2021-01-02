@@ -256,10 +256,10 @@ def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[Tuple[ListOfPoi
 
         # znajdujemy styczne 
         # znajdujemy styczne 
-        # left_tangent_idx = tangent_l(point2_set[i], convex_hull)
-        # right_tangent_idx = tangent_r(point2_set[i], convex_hull)
-        left_tangent_idx = ltangent(convex_hull, point2_set[i])
-        right_tangent_idx = rtangent(convex_hull, point2_set[i])
+        left_tangent_idx = tangent_l(point2_set[i], convex_hull)
+        right_tangent_idx = tangent_r(point2_set[i], convex_hull)
+        # left_tangent_idx = ltangent(convex_hull, point2_set[i])
+        # right_tangent_idx = rtangent(convex_hull, point2_set[i])
         
         if left_tangent_idx is None:
             print('nie wyznaczono lewej stycznej')
