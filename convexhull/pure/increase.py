@@ -13,7 +13,29 @@ from pprint import pprint
 import operator
 
 
-def rtangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+
+def rltangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+    n = len(polygon)
+    
+    right = index_of_max(polygon, cmp_idx=0)
+
+    left = right
+    
+    while orientation(point, polygon[left % n], polygon[(left-1) % n]) != -1:
+        if dist_sq(point, polygon[left % n]) <= dist_sq(point, polygon[(left-1)%n]):
+            break    
+        left = (left - 1) % n
+    
+    while orientation(point, polygon[right % n], polygon[(right+1)%n]) != 1:
+        if dist_sq(point, polygon[right % n]) >= dist_sq(point, polygon[(right+1)%n]):
+            break
+        right = (right+1) % n
+        
+    return left, right
+    
+
+
+def rtangentbeta(polygon: ListOfPoints, point: Point) -> Union[int, None]:
     print('szukam stycznej do otoczki')
     pprint(polygon)
     print('przechodzacej przez punkt ', point)
@@ -62,7 +84,7 @@ def rtangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
                     l = m
                     
     
-def ltangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
+def ltangentbeta(polygon: ListOfPoints, point: Point) -> Union[int, None]:
     print('szukam stycznej do otoczki')
     pprint(polygon)
     print('przechodzacej przez punkt ', point)
@@ -129,10 +151,13 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         # znajdujemy styczne
         print('obecnie znana otoczka')
         pprint(convex_hull)
+
+        rltang = rltangent(convex_hull, point2_set[i])
         print(f'szukam lewej stycznej z {point2_set[i]}')
         # left_tangent_idx = left_tangent(convex_hull, point2_set[i])
         # left_tangent_idx = tangent_l(point2_set[i], convex_hull)
-        left_tangent_idx = ltangent(convex_hull, point2_set[i])
+        # left_tangent_idx = ltangent(convex_hull, point2_set[i])
+        left_tangent_idx = rltang[0]
         
         if left_tangent_idx is None:
             print('nie znaleziono lewej stycznej')
@@ -143,7 +168,8 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         # print(f'szukam prawej stycznej z {point2_set[i]}') 
         # right_tangent_idx = right_tangent(convex_hull, point2_set[i])
         # right_tangent_idx = tangent_r(point2_set[i], convex_hull)
-        right_tangent_idx = rtangent(convex_hull, point2_set[i])
+        # right_tangent_idx = rtangent(convex_hull, point2_set[i])
+        right_tangent_idx = rltang[1]
         
         # if right_tangent_idx is None:
         #     print('nie znaleziono prawej stycznej')
@@ -190,13 +216,13 @@ def main():
     pprint(points)
     print('-' * 10)
     
-    # convex_hull = increase_with_sorting(points)
+    convex_hull = increase_with_sorting(points)
     
     # save_points_to_json(file_path, convex_hull, indent = 4)    
     
     plot = Plot(scenes=[Scene(points=[PointsCollection(points)])])
     
-    # plot.add_scene(Scene(points=[PointsCollection(convex_hull, color='r')]))
+    plot.add_scene(Scene(points=[PointsCollection(convex_hull, color='r')]))
     
     plot.draw()
 
@@ -208,26 +234,4 @@ def main():
     # plot.draw()
 
 if __name__ == "__main__": 
-#     obecnie znana otoczka
-# [[0.0, 0.028115298754645135],
-#  [0.01523045649619581, 0.0],
-#  [9.996688970065955, 0.0],
-#  [10.0, 0.0026406644727150486],
-#  [9.999950578062139, 10.0],
-#  [0.025116610956338326, 10.0],
-#  [0.0, 9.999951234026465]]
-# szukam lewej stycznej z [10.0, 0.038506319393473154]
-# znaleziono lewa styczna 3
-# obecnie znana otoczka
-# [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
-# szukam lewej stycznej z [10.0, 0.06725244544593334]
-# tangent_l zwraca None
-# [10.0, 0.06725244544593334]
-# [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
-# nie znaleziono lewej stycznej
-
-    point = [10.0, 0.038506319393473154]
-    ch = [[0.0, 0.05910278687448978], [10.0, 0.038506319393473154]]
-    a = tangent_l(point, ch)
-    print(a)
-
+    main()
