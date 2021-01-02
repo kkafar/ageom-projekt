@@ -23,7 +23,7 @@ def nextvert(C, curr, plot=None, ans=None,
     i, j = curr
     nxt = (i, (j + 1) % len(C[i]))
     for k in range(len(C)):
-        t = tangent(C[i][j], C[k])
+        t = tangent_r(C[i][j], C[k])
         if t == None:
             continue
 
@@ -31,7 +31,7 @@ def nextvert(C, curr, plot=None, ans=None,
             plot.add_scene(
                 Scene(points=[PointsCollection(deepcopy(points)), PointsCollection(deepcopy(ans), color='green'),
                               PointsCollection(deepcopy(C[k]), color='red'),
-                              PointsCollection([C[k][t]], color='firebrick'),
+                              PointsCollection([C[k][t]], color='black'),
                               PointsCollection([C[nxt[0]][nxt[1]]], color='violet')],
                       lines=[LinesCollection(makeSheaf(ans), color='yellow'),
                              LinesCollection([[ans[len(ans) - 1], C[nxt[0]][nxt[1]]]], color='violet'),
@@ -63,6 +63,7 @@ def chanUtil(points, m, plot=None):
     curr = (0, 0)
     ans = []
     i = 0
+
     while i < m:
         ans.append(C[curr[0]][curr[1]])
         if plot != None:
