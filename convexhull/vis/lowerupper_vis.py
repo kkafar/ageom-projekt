@@ -12,7 +12,7 @@ import operator
 
 
 
-def lower_upper_vis(point2_set: ListOfPoints) -> tuple[ListOfPoints, Plot]:
+def lower_upper_vis(point2_set: ListOfPoints) -> Tuple[ListOfPoints, Plot]:
     upper_ch_segments = [ ] 
     lower_ch_segments = [ ] 
     plot = Plot(scenes = [])

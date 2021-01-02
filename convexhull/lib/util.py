@@ -3,7 +3,7 @@
 import json
 import simplejson
 from typing import Literal, Union
-from lib.mytypes import ListOfPoints, ListOfSegments, Point, Segment
+from lib.mytypes import *
 from random import randint
 import matplotlib.colors as mcolors
 import math
@@ -32,7 +32,7 @@ def det3x3( ux, uy, uz,
     return (ux * vy * wz) + (uy * vz * wx) + (uz * vx * wy) - (wx * vy * uz) - (wy * vz * ux) - (wz * vx * uy)
 
 
-def orientation(p1: Point, p2: Point, p3: Point, eps: float = 1e-7) -> Literal[-1, 0, 1]:
+def orientation(p1: Point, p2: Point, p3: Point, eps: float = 1e-5) -> Literal[-1, 0, 1]:
     """ Zwraca\n
     -1 <- jeśli p3 znajdue się po prawej stronie (p1, p2)\n
     0 <- jesli p3 jest współliniowy z (p1, p2)\n
@@ -113,7 +113,7 @@ def intersection_with_sweep(segment: Segment, sweep_y: float, eps: float = 1e-7)
 
         
         
-def index_of_min(points: list[Point], cmp_idx = 0) -> Union[int, None]:
+def index_of_min(points: ListOfPoints, cmp_idx = 0) -> Union[int, None]:
     """ Zwraca indeks pod którym znajduje się minimum zbioru danych. cmp_idx - indeks
     po którym mają być porównywane punkty."""
 
@@ -133,7 +133,7 @@ def index_of_min(points: list[Point], cmp_idx = 0) -> Union[int, None]:
     return min_idx
 
 
-def index_of_max(points: list[Point], cmp_idx = 0) -> Union[int, None]:
+def index_of_max(points: ListOfPoints, cmp_idx = 0) -> Union[int, None]:
     """ Zwraca indeks pod którym znajduje się maksimum zbioru danych. cmp_idx - indeks
     po którym mają być porównywane punkty. """
 

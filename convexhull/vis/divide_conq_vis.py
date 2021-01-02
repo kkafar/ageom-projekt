@@ -7,12 +7,12 @@ from lib.mytypes import ListOfPoints
 from lib.geometric_tool_lab import *
 from lib.util import *
 from lib.getrand import *
-from pure.graham import graham
+from pure.jarvis import jarvis
 from pprint import pprint
 import operator 
 
 
-def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: list[Point], points: list[Point], scenes: list[Scene]) -> list[Point]:
+def merge_convex_hulls_vis(left_convex_hull: ListOfPoints, right_convex_hull: ListOfPoints, points: ListOfPoints, scenes: ListOfPoints) -> ListOfPoints:
     """ Łączenie dwóch rozdzielnych otoczek. Otoczki muszą być zadane w formie wierzchołków podanych w kolejności przeciwnej do 
     ruchu wskazówek zegara. Ponadto left_convex_hull powinno być lewą otoczką, a right_convex_hull prawą. """
 
@@ -57,11 +57,23 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
     
 
     # górna styczna
-    while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1 or orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
+    left_flag, right_flag = True, True
+    while   orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) != -1 and right_flag \
+            or \
+            orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) != 1 and left_flag:
+                
+        left_flag, right_flag = False, False
+        
         # podnosimy punkt na prawej otoczce
-        while orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size]) == 1:
+        left_right_orient = orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size])
+        while left_right_orient != -1:
+            if left_right_orient == 0 and dist_sq(left, right) >= dist_sq(left, right_convex_hull[(right_idx - 1) % right_ch_size]):
+                right_flag = False
+                break
+            
             right_idx = (right_idx - 1) % right_ch_size
             right = right_convex_hull[right_idx]
+            left_right_orient = orientation(left, right, right_convex_hull[(right_idx - 1) % right_ch_size])
             scenes.append(Scene(
                 points=[
                     PointsCollection(points, marker='.'),
@@ -76,11 +88,19 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
                     LinesCollection([[left, right]], linestyle='dotted', color='r')
                 ]
             ))
+        else:
+            right_flag = True
 
         # podnosimy punkt na lewej otoczce
-        while orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size]) == -1:
+        right_left_orient = orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size])
+        while right_left_orient != 1:
+            if right_left_orient == 0 and dist_sq(right, left) >= dist_sq(right, left_convex_hull[(left_idx + 1) % left_ch_size]):
+                left_flag = False
+                break
+            
             left_idx = (left_idx + 1) % left_ch_size
             left = left_convex_hull[left_idx]
+            right_left_orient = orientation(right, left, left_convex_hull[(left_idx + 1) % left_ch_size])
             scenes.append(Scene(
                 points=[
                     PointsCollection(points, marker='.'),
@@ -95,6 +115,8 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
                     LinesCollection([[left, right]], linestyle='dotted', color='r')
                 ]
             ))
+        else:
+            left_flag = True
             
             
     upper_tangent_left_idx = left_idx
@@ -111,11 +133,21 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
     left_idx = left_ch_rightmost_idx
     right_idx = right_ch_leftmost_idx
             
-    while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) == -1 or orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) == 1:
+    left_flag, right_flag = True, True
+    while   orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) != 1 and right_flag \
+            or \
+            orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) != -1 and left_flag:
+        left_flag, right_flag = False, False
+
         # opuszczamy punkt na prawej otoczce
-        while orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size]) == -1:
+        left_right_orient = orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size])
+        while left_right_orient != 1:
+            if left_right_orient == 0 and dist_sq(left, right) >= dist_sq(left, right_convex_hull[(right_idx + 1) % right_ch_size]):
+                right_flag = False
+                break
             right_idx = (right_idx + 1) % right_ch_size
             right = right_convex_hull[right_idx]
+            left_right_orient = orientation(left, right, right_convex_hull[(right_idx + 1) % right_ch_size])
             scenes.append(Scene(
                 points=[
                     PointsCollection(points, marker='.'),
@@ -130,13 +162,22 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
                     upper_tangent_lc,
                     LinesCollection([[left, right]], linestyle='dotted', color='r')
                 ]
-            ))           
+            ))   
+        else:
+            right_flag = True
             
 
         # opuszczamy punkt na lewej otoczce
-        while orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) == 1:
+        right_left_orient = orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size])
+        while orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size]) != -1:
+            if right_left_orient == 0 and dist_sq(right, left) >= dist_sq(right, left_convex_hull[(left_idx - 1) % left_ch_size]):
+                left_flag = False
+                break
+                    
             left_idx = (left_idx - 1) % left_ch_size
             left = left_convex_hull[left_idx]
+            right_left_orient = orientation(right, left, left_convex_hull[(left_idx - 1) % left_ch_size])
+            
             scenes.append(Scene(
                 points=[
                     PointsCollection(points, marker='.'),
@@ -152,6 +193,8 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
                     LinesCollection([[left, right]], linestyle='dotted', color='r')
                 ]
             ))
+        else:
+            left_flag = True
             
             
     lower_tangent_left_idx = left_idx
@@ -194,13 +237,13 @@ def merge_convex_hulls_vis(left_convex_hull: list[Point], right_convex_hull: lis
     return merged_convex_hull 
 
 
-def divide_conq_vis(point2_set: list[Point], k: int) -> Union[tuple[list[Point], Plot], None]:
+def divide_conq_vis(point2_set: ListOfPoints, k: int) -> Union[Tuple[ListOfPoints, Plot], None]:
     if len(point2_set) < 3 or k <= 0: return None     
 
     plot = Plot(scenes=[Scene(points=[PointsCollection(point2_set)])])
     
 
-    def divide_conq_rec_viz(points: list[Point], scenes: list[Scene]) -> list[Point]:
+    def divide_conq_rec_viz(points: ListOfPoints, scenes: ListOfPoints) -> ListOfPoints:
         if len(points) <= 2:
             scenes.append(Scene(
                 points=[
@@ -215,7 +258,7 @@ def divide_conq_vis(point2_set: list[Point], k: int) -> Union[tuple[list[Point],
             ))
             return points
         elif len(points) <= k:
-            convex_hull = graham(points)
+            convex_hull = jarvis(np.array(points))
             scenes.append(Scene(
                 points=[
                     PointsCollection(point2_set, marker='.'),
@@ -341,7 +384,9 @@ def divide_conq_vis(point2_set: list[Point], k: int) -> Union[tuple[list[Point],
 def main():
     # points_save_path = './divide_conq_data/points.json'
 
-    points = rand_point2_set(30, 0, 10).tolist()
+    # points = rand_point2_set(30, 0, 10).tolist()
+    points = rand_rect_points(100, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
+
     # points = load_points_from_json(points_save_path)
     
     # save_points_to_json(points_save_path, points, 4)

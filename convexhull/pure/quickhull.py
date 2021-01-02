@@ -1,5 +1,5 @@
 from copy import deepcopy
-from det import *
+from lib.det import *
 
 def furthest(a, b, considering):
     n = len(considering)

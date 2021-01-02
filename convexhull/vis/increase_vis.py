@@ -126,7 +126,7 @@ def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
                     left = mid
 
 
-def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[tuple[ListOfPoints, Plot], None]:
+def increase_with_sorting_vis(point2_set: ListOfPoints) -> Union[Tuple[ListOfPoints, Plot], None]:
     if len( point2_set ) < 3: return None
     
     plot = Plot(scenes=[Scene(points=[PointsCollection(point2_set)])])

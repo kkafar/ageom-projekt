@@ -1,13 +1,14 @@
 """ K. Kafara """
 
+from typing import Tuple, List
 
-Point = tuple[float, float]
+Point = Tuple[float, float]
 
-Segment = tuple[Point, Point]
+Segment = Tuple[Point, Point]
 
-ListOfPoints = list[Point] 
+ListOfPoints = List[Point] 
 
-ListOfSegments = list[Segment]
+ListOfSegments = List[Segment]
 
 
 
