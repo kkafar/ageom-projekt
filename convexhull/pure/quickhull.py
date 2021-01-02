@@ -15,7 +15,8 @@ def furthest(a, b, considering):
 
 
 def insideTriangle(a, b, c, i):
-    if det(a, b, i) > 0 and det(b, c, i) > 0 and det(c, a, i) > 0:
+    accur=10**(-7)
+    if det(a, b, i) > -accur and det(b, c, i) > -accur and det(c, a, i) > -accur:
         return True
     return False
 
@@ -42,8 +43,8 @@ def quickHullUtil(a, b, considering):
 
 
 def quickHull(points):
-    a = min(points, key=lambda x: x[0])
-    b = max(points, key=lambda x: x[0])
+    a = min(points, key=lambda x: x)
+    b = max(points, key=lambda x: x)
 
     considering = deepcopy(points)
 
