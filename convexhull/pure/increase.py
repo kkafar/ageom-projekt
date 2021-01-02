@@ -145,13 +145,9 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     
     point2_set.sort(key = operator.itemgetter(0, 1))
     
-    print('zbior wyjsciowy')
-    pprint(point2_set)
-    
     # bierzemy pierwsze 3 punkty i tworzymy z nich otoczkę
     convex_hull = point2_set[:3]
 
-    print('pierwsze 3 punkty')
     pprint(convex_hull)
 
 
@@ -164,7 +160,8 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         print('obecnie znana otoczka')
         pprint(convex_hull)
         print(f'szukam lewej stycznej z {point2_set[i]}')
-        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
+        # left_tangent_idx = left_tangent(convex_hull, point2_set[i])
+        left_tangent_idx = tangent_l(point2_set[i], convex_hull)
         
         if left_tangent_idx is None:
             print('nie znaleziono lewej stycznej')
@@ -173,7 +170,8 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
             
         
         print(f'szukam prawej stycznej z {point2_set[i]}') 
-        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
+        # right_tangent_idx = right_tangent(convex_hull, point2_set[i])
+        right_tangent_idx = tangent_r(point2_set[i], convex_hull)
         
         if right_tangent_idx is None:
             print('nie znaleziono prawej stycznej')
@@ -220,7 +218,7 @@ def main():
     pprint(points)
     print('-' * 10)
     
-    convex_hull = increase_with_sorting(points)
+    # convex_hull = increase_with_sorting(points)
     
     # save_points_to_json(save_file_path, convex_hull, indent = 4)    
     

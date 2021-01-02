@@ -1,5 +1,8 @@
 from copy import deepcopy
-from det import *
+from lib.det import *
+from lib.geometric_tool_lab import *
+from lib.util import *
+
 def furthest(a, b, considering):
     n = len(considering)
     i = 0

@@ -5,6 +5,7 @@ import json
 from typing import Literal, Union
 from lib.mytypes import *
 from random import randint
+from pprint import pprint
 import matplotlib.colors as mcolors
 import math
 import numpy as np
@@ -211,6 +212,9 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            print('tangent_r UTIL zwraca NONE')
+            print(p)
+            pprint(Q)
             return None
 
         mid = (l + r) // 2
@@ -249,6 +253,10 @@ def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            print('tangent_l UTIL zwraca NONE')
+            print(p)
+            pprint(Q)
+            print(Q[l], Q[r])
             return None
 
         mid = (l + r) // 2

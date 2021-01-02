@@ -1,6 +1,10 @@
 from random import randint
 from copy import deepcopy
-from det import *
+from lib.det import *
+from lib.util import *
+from pure.graham import graham
+import matplotlib.colors as mcolors
+from lib.geometric_tool_lab import *
 
 
 def randomColor():
@@ -23,7 +27,7 @@ def nextvert(C, curr, plot=None, ans=None,
     i, j = curr
     nxt = (i, (j + 1) % len(C[i]))
     for k in range(len(C)):
-        t = tangent(C[i][j], C[k])
+        t = tangent_r(C[i][j], C[k])
         if t == None:
             continue
 
@@ -48,7 +52,7 @@ def chanUtil(points, m, plot=None):
     Q = divide(points, m)
     C = []
     for i in range(len(Q)):
-        C.append(Graham(Q[i]))
+        C.append(graham(Q[i]))
 
     if plot != None:
         pkt = [PointsCollection(deepcopy(Q[i]), color=randomColor()) for i in range(len(Q))]
@@ -91,7 +95,7 @@ def chan(points, visual=False):
         m = min(n, m * m)
 
     if visual == True:
-        plot.add_scene(Scene(points=[PointsCollection(a), PointsCollection(hoax, color='green')],
+        plot.add_scene(Scene(points=[PointsCollection(points), PointsCollection(hoax, color='green')],
                              lines=[LinesCollection(makeFullSheaf(hoax), color='yellow')]))
         return plot
 
