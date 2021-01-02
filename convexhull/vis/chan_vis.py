@@ -35,7 +35,7 @@ def nextvert(C, curr, plot=None, ans=None,
             plot.add_scene(
                 Scene(points=[PointsCollection(deepcopy(points)), PointsCollection(deepcopy(ans), color='green'),
                               PointsCollection(deepcopy(C[k]), color='red'),
-                              PointsCollection([C[k][t]], color='firebrick'),
+                              PointsCollection([C[k][t]], color='black'),
                               PointsCollection([C[nxt[0]][nxt[1]]], color='violet')],
                       lines=[LinesCollection(makeSheaf(ans), color='yellow'),
                              LinesCollection([[ans[len(ans) - 1], C[nxt[0]][nxt[1]]]], color='violet'),
@@ -67,6 +67,7 @@ def chanUtil(points, m, plot=None):
     curr = (0, 0)
     ans = []
     i = 0
+
     while i < m:
         ans.append(C[curr[0]][curr[1]])
         if plot != None:
