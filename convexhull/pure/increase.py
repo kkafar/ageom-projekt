@@ -1,6 +1,8 @@
 
 import os
 from sys import path
+
+from numpy.lib.polynomial import poly
 path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
 
 from lib.mytypes import ListOfPoints
@@ -17,14 +19,22 @@ def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
     
     n = len(polygon)
 
-    if n < 3: return None
+    # if n < 3: return None
     
     
     # v_i > v_j <=> v_j znajduje się po lewej stronie odcinka point-v_i 
     # mówimy, że krawędż e_i = v_i -> v_(i+1) jest skierowana w dół, jeżeli v_i > v_(i+1)\
     
+    
     # sprawdzamy czy v0 nie jest szukanym punktem styczności
-    if orientation(polygon[0], polygon[1], point) == 1 and orientation(polygon[-1], polygon[0], point) == -1:
+    succ_orient =  orientation(polygon[0], polygon[1], point)
+    pred_orient = orientation(polygon[-1], polygon[0], point)
+    dist_p0 = dist_sq(polygon[0], point)
+    if succ_orient == 1 and pred_orient == -1:
+        return 0
+    elif succ_orient == 0 and pred_orient == 0 and dist_p0 <= dist_sq(polygon[-1], point) and dist_p0 <= dist_sq(polygon[1], point):
+        return 0
+    elif succ_orient == 1 and pred_orient == 0:
         return 0
     
     left = 0
@@ -44,7 +54,8 @@ def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
         # jeżeli mid nie był punktem stycznośći, to musimy zdecydować w którym łańcuchu go szukamy
         # [left, mid] czy [mid, right]
         
-        is_left_up: bool = (orientation(polygon[left % n], polygon[(left + 1) % n], point) == -1)
+        left_orient = orientation(polygon[left % n], polygon[(left + 1) % n], point)
+        is_left_up: bool = (left_orient != 1)
         
         if is_left_up:
             if is_mid_down:
@@ -134,17 +145,25 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     
     point2_set.sort(key = operator.itemgetter(0, 1))
     
+    print('zbior wyjsciowy')
+    pprint(point2_set)
+    
     # bierzemy pierwsze 3 punkty i tworzymy z nich otoczkę
     convex_hull = point2_set[:3]
 
-    # musimy zapewnić, że wierzchołki wyjściowej otoczki są podane w kolejności przeciwnej do ruchu wskazówek zegara
+    print('pierwsze 3 punkty')
+    pprint(convex_hull)
+
+
+    # musimy zapewnić, że wierzchołki wyjściowej otoczki są podane w kolejności przeciwnej do ruchu wskazówek zegara 
     if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
         convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
     
-    
     for i in range(3, len( point2_set )):
-        # znajdujemy styczne j
-        print('szukam lewej stycznej')
+        # znajdujemy styczne
+        print('obecnie znana otoczka')
+        pprint(convex_hull)
+        print(f'szukam lewej stycznej z {point2_set[i]}')
         left_tangent_idx = left_tangent(convex_hull, point2_set[i])
         
         if left_tangent_idx is None:
@@ -153,7 +172,7 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
             print(f'znaleziono lewa styczna {left_tangent_idx}')
             
         
-        print('szukam prawej stycznej') 
+        print(f'szukam prawej stycznej z {point2_set[i]}') 
         right_tangent_idx = right_tangent(convex_hull, point2_set[i])
         
         if right_tangent_idx is None:
@@ -164,35 +183,40 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         left_tangent_point = convex_hull[left_tangent_idx]
         right_tangent_point = convex_hull[right_tangent_idx]        
 
-        deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
+        deletion_side: Literal[-1, 0, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
 
-        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
-            step = 0
-        else: 
-            step = -1
+        if deletion_side != 0:
+            if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
+                step = 0
+            else: 
+                step = -1
+                
+            left = (left_tangent_idx + 1) % len(convex_hull)
             
-        left = (left_tangent_idx + 1) % len(convex_hull)
-        
-        while convex_hull[left] != right_tangent_point:
-            convex_hull.pop(left)
-            left = (left + step) % len(convex_hull)
-            
-        convex_hull.insert(left, point2_set[i])
+            while convex_hull[left] != right_tangent_point:
+                convex_hull.pop(left)
+                left = (left + step) % len(convex_hull)
+                
+            convex_hull.insert(left, point2_set[i])
+        else:
+            # point2_set[i] jest współliniowy z obydwoma punktami styczności oraz jest ponad nimi 
+            # wtedy w finalnym zbiorze powinny znaleźć się tylko 2 punkty - lewy punkt styczności oraz point2_set[i]
+            convex_hull = [point2_set[left_tangent_idx], point2_set[i]]
 
     return convex_hull
 
 
 def main(): 
-    # file_path = 'test_data/points3.json'
+    file_path = '../debug/increase_data.json'
     # save_file_path = 'test_data/convex_hull3.json'
     
     point_count = 30
     
-    points = rand_point2_set(point_count, 0, 10).tolist()
-    points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
-    # points = load_points_from_json(file_path)
+    # points = rand_point2_set(point_count, 0, 10).tolist()
+    # points = rand_rect_points(point_count, [[0, 0], [10, 0], [10, 10], [0, 10]]).tolist()
+    points = load_points_from_json(file_path)
 
-    # save_points_to_json(file_path, point_set, indent=4)
+    # save_points_to_json(file_path, points, indent=4)
     pprint(points)
     print('-' * 10)
     
@@ -200,7 +224,10 @@ def main():
     
     # save_points_to_json(save_file_path, convex_hull, indent = 4)    
     
-    pprint(convex_hull)
+    plot = Plot(scenes=[Scene(points=[PointsCollection(points)])])
+    
+    plot.draw()
+    # pprint(convex_hull)
     
     
     
