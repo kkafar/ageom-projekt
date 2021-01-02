@@ -8,12 +8,21 @@
 3. [x] przyrostowy
 4. [x] przyrostowy -- wizualizacja
 5. [x] dziel i rządź 
-6. [x] dziel i rządź -- wizualizacja 
+6. [x] dziel i rządź -- wizualizacja
 
 ## Issues
 
 1. [x] Naprawa importów
 2. [x] Poprawić obsługę przpadku podstawowego w dziel i rządź (obsługiwać jakimś algorytmem, a nie przy k <= 2)
+3. [ ] Dziel i zwyciężaj (małe k w stosunku do N -- błąd)
+4. [ ] Chan przy dużych zbiorach punktów się sypie
+5. [ ] Przyrostowy przy dużych zbiorach się sypie
+6. [ ] Wyczyśić kod z zbędnych funkcji (tych które są już nie używane)
+7. [ ] Na końcu zaktualizować kody w sprawozdaniu (dokumentacji)
+8. [ ] Zaktaualizować opisy w dokumentacji
+9. [ ] Dodać pomiary czasu do prezentacji i sprawozdania
+10. [ ] Tabelki z pomiarami czasu do sprawozdania 
+11. [ ] Bibliografie (koniecznie mają być, odniesień nie robimy)
 
 
 # Sprawozdanie / dokumentacja
@@ -71,3 +80,5 @@ W trakcie prezentacji należy przedstawić sposób działania programu
     2. [ ] Na początku wygenerujemy punkty
     3. [ ] Będzie można przetestować kolejne algorytmy (zobaczyć jak działają) 
     4. [ ] Do każdego algorytmu krótki opis działania.
+
+
