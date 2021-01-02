@@ -215,50 +215,6 @@ def det(a,b,c):
     return a[0]*b[1]-a[0]*c[1]-b[0]*a[1]+b[0]*c[1]+c[0]*a[1]-c[0]*b[1]
 
 
-def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
-    # wykorzystujemy binary search na otoczce - jesli dany wierzcholek jest po prawej stronie punktu tworzacej styczna
-    # lewostronna z p,
-    ln = len(Q)
-
-    def tangetUtil(p, Q, l, r):
-        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-            print('tangent_l zwraca None')
-            print(p)
-            pprint(Q)
-            return None
-
-        mid = (l + r) // 2
-        if det(Q[0], Q[1], p) >= accur and det(Q[ln - 1], Q[0], p) >= accur:
-            if (det(Q[0], p, Q[mid]) >= accur) or (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and \
-                                                    det(p, Q[mid], Q[(mid - 1) % ln]) >= accur) or \
-                    (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur):
-                return tangetUtil(p, Q, l, mid-1)
-
-        else:
-            if  det(Q[ln - 1], Q[0], p) >= accur and det(Q[0], Q[1], p) <= - accur:
-                return 0
-            if det(Q[0], p, Q[mid]) < accur and \
-                    ((det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) or \
-                     (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[
-                         (mid - 1) % ln]) >= accur)):  # chyba nie potrzebne sprawdz na koncu
-                return tangetUtil(p, Q, l, mid-1)
-
-        if (det(p, Q[mid], Q[(mid + 1) % ln]) < accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) \
-                or (
-                -accur < det(p, Q[mid], Q[(mid + 1) % ln]) < accur and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
-                (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
-
-            while -accur < det(p, Q[mid], Q[(mid - 1) % ln]) < accur and length([Q[(mid - 1) % ln], p]) > length(
-                    [Q[mid], p]):
-                mid = (mid - 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
-            return mid
-
-        else:
-            return tangetUtil(p, Q, mid + 1, r)
-
-    return tangetUtil(p, Q, 0, ln - 1)
-
-
 def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
     # wykorzystujemy binary search na otoczce - jesli dany wierzcholek jest po prawej stronie punktu tworzacej styczna
     # lewostronna z p,
@@ -266,9 +222,6 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-            print('tangent_r zwraca None')
-            print(p)
-            pprint(Q)
             return None
 
         mid = (l + r) // 2
@@ -297,6 +250,47 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
         else:
             return tangetUtil(p, Q, l, mid - 1)
+
+    return tangetUtil(p, Q, 0, ln - 1)
+
+def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
+    # wykorzystujemy binary search na otoczce - jesli dany wierzcholek jest po prawej stronie punktu tworzacej styczna
+    # lewostronna z p,
+    ln = len(Q)
+
+    def tangetUtil(p, Q, l, r):
+        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            return None
+
+        mid = (l + r) // 2
+        if det(Q[0], Q[1], p) >= accur and det(Q[ln - 1], Q[0], p) >= accur:
+            if (det(Q[0], p, Q[mid]) >= accur) or (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and \
+                                                    det(p, Q[mid], Q[(mid - 1) % ln]) >= accur) or \
+                    (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur):
+                return tangetUtil(p, Q, l, mid-1)
+
+        else:
+            if  det(Q[ln - 1], Q[0], p) >= accur and det(Q[0], Q[1], p) <= - accur:
+                return 0
+            if det(Q[0], p, Q[mid]) < accur and \
+                    ((det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) or \
+                     (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[
+                         (mid - 1) % ln]) >= accur)):  # chyba nie potrzebne sprawdz na koncu
+                if ln > 2:
+                    return tangetUtil(p, Q, l, mid-1)
+
+        if (det(p, Q[mid], Q[(mid + 1) % ln]) < accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) \
+                or (
+                -accur < det(p, Q[mid], Q[(mid + 1) % ln]) < accur and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
+                (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
+
+            while -accur < det(p, Q[mid], Q[(mid - 1) % ln]) < accur and length([Q[(mid - 1) % ln], p]) > length(
+                    [Q[mid], p]):
+                mid = (mid - 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
+            return mid
+
+        else:
+            return tangetUtil(p, Q, mid + 1, r)
 
     return tangetUtil(p, Q, 0, ln - 1)
 
