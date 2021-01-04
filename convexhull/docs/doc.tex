@@ -12,8 +12,8 @@
 \usepackage{listings}
 \usepackage[polish]{babel}
 \usepackage[normalem]{ulem}
-\usepackage[backend=biber,style=alphabetic,sorting=ynt]{biblatex}
-\addbibresource{bibliography.bib}
+% \usepackage[backend=biber,style=alphabetic,sorting=ynt]{biblatex}
+% \addbibresource{bibliography.bib}
 
 
 \useunder{\uline}{\ul}{}
@@ -135,23 +135,45 @@ Moduł zawiera w sobie następujące podmoduły:
 \subsection{Wymagania techniczne}
 
 \begin{enumerate}
-    \item   Python 3.9.0 64-bit lub nowszy
+    \item   Python 3.8.3 64-bit lub nowszy wraz z modułami:
+            \begin{itemize}
+                \item   \emph{matplotlib}
+                \item   \emph{numpy}
+                \item   \emph{json}
+                \item   \emph{csv}
+                \item   \emph{pprint}
+            \end{itemize}
     \item   Jupyter Notebook
 \end{enumerate}
 
 \subsection{Korzystanie z programu}
 
-\subsubsection{Uruchomienie wizualizacji}
+\subsubsection{Uruchomienie programu}
 
-W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{program.ipynb},
-a następnie zapoznać się z zamieszczoną tam instrukcją. 
+W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{program.ipynb}, oraz wykonywać kolejne komórki notatnika.
+
+W celu uruchomienia pomiarow wydajności algorytmów należy przejść do sekcji \emph{Pomiary czasu} wykonać pierwszą komórkę (z importami algorytmów) a następnie przeprowadzać testy i wyświetlać rezultaty w 
+interesujących nas przypadkach. 
 
 
 \section{Oznaczenia i definicje}
 
-Na potrzeby dalszych wywodów przyjmujemy w tym miejscu szereg oznaczeń i definicji:
+Na potrzeby dalszych wywodów przyjmujemy w tym miejscu szereg oznaczeń i definicji:\\
 
+\begin{definition}
+    \bold{Zbiorem wypukłym} nazwiemy dowolny podzbiór płaszczyzny taki, że dla każdych dwóch punktów do niego należących, odcinek je łączący również należy do tego zbioru.
+\end{definition}
 
+\medskip
+
+\begin{definition}
+    \bold{Otoczką wypukłą} dowolnego zbioru punktów $S$ płaszczyzny nazwiemy najmiejszy zbiór wypukły $CH(S)$ zawierający $S$. 
+\end{definition}
+
+\medskip
+
+Algorytmicznie otoczkę wypułką dowolnego zbioru $S$ punktów płaszczyzny reprezentujemy jako ciąg punktów (wierzchołołków) $<v_1, v_2, \ldots, v_n>$ wielokąta wypukłego, gdzie $\forall i \in \{1, \ldots, n\}$ $v_i$ jest 
+poprzednikiem $v_{i+1}$ (w kolejności wierzchołków przeciwnej do ruchu wskazówek zegara).
 
 
 \section{Problem}
@@ -433,162 +455,41 @@ return upper_ch
     \subsubsection{Szczegóły}
         \subsubsection*{Wyznaczanie stycznych}
 
-        Styczne wyznaczamy w czasie logartymicznym względem liczby punktów należących do otoczki do której szukamy stycznych, 
-        wykonując poszukiwanie binarne elementów skrajnych (najmniejszego i największego) względem następującego porządku, 
-        określonego dla dowolnych dwóch punktów płaszczyzny $P_1$, $P_2$, względem ustalonego punktu $Q$: \\
-        $P_1 >_Q P_2 \Leftrightarrow P_2$ znajduje się po lewej stronie odcinka skierowanego $QP_1$.
-
-        W tak określonym porządku elementem największym będzie prawy punkt styczności $P_{max}$, ponieważ wszystkie inne punkty otoczki 
-        znajdują się na lewo od prostej (stycznej) $QP_{max}$. Podobnie lewym punktem styczności będzie element najmniejszy 
-        w zadanym porządku $P_{min}$. \\
-
-        Wyznaczanie $P_{max}$ ($P_{min}$ wyznaczamy w sposób zupełnie analogiczny):\\
-        Wprowadźmy najpierw potrzebne oznaczenia: \\
-        $Q$ punkt zewnętrzny, przez który mają przechodzić styczne do otoczki.\\
-        Niech otoczka będzie dana w postaci ciągu punktów $P_0, \ldots, P_{k-1}$ ($P_k := P_0$) będących współrzędnymi kolejnych wierzchołków w kolejności przeciwnej
-        do ruchu wskazówek zegara.\\ 
-        Krawędź skierowaną otoczki $e_i$ definiujemy następująco: $e_i := P_iP_{i+1}$. \\
-        Krawędź $e_i := P_iP_{i+1}$ jest skierowana w górę $\Leftrightarrow$ $P_{i+1} >_Q P_i$.\\
-        Krawędź $e_i$ jest skierowana w dół, jeżeli nie jest skierowana w górę. 
-
-        \begin{enumerate}
-            \item   Jeżeli $P_0$ jest większy od swoich obudwu sąsiadów, to go zwracamy jako element
-                    największy. 
-            \item   Definujemy indeksy $l := 0$, $r := k$
-            \item   Dopóki nie znajdziemy elementu największego:
-                    \begin{enumerate}
-                    \item   Wyznaczamy indeks środkowego elementu $m := \left\lfloor \frac{l + k}{2} \right\rfloor$
-                    \item   Jezeli $P_m$ jest elementem największym:
-                            \begin{itemize}
-                                \item   Zwracamy $P_m$.
-                            \end{itemize}
-                    \item   Jeżeli $e_l$ jest skierowana w górę:
-                            \begin{enumerate}
-                                \item   Jeżeli $e_m$ jest skierowana w dół 
-                                        \begin{itemize}
-                                            \item $r := m$
-                                        \end{itemize}
-                                \item   W przeciwnym przypadku
-                                        \begin{enumerate}
-                                            \item   Jeżeli $P_l >_Q P_m$:
-                                                    \begin{itemize}
-                                                        \item $r := m$
-                                                    \end{itemize}
-                                            \item   W przeciwnym przypadku
-                                                    \begin{itemize}
-                                                        \item $l := m$
-                                                    \end{itemize}
-                                        \end{enumerate}
-                            \end{enumerate}
-                    \item   W przeciwnym przypadku:
-                            \begin{enumerate}
-                                \item   Jeżeli $e_m$ jest skierowana w górę:
-                                        \begin{itemize}
-                                            \item $l := m$
-                                        \end{itemize}
-                                \item   W przeciwnym przypadku: 
-                                        \begin{enumerate}
-                                            \item   Jeżeli $P_m >_Q P_l$:
-                                                    \begin{itemize}
-                                                        \item $r := m$
-                                                    \end{itemize}
-                                            \item   W przeciwnym przypadku:
-                                                    \begin{itemize}
-                                                        \item $l := m$
-                                                    \end{itemize}
-                                        \end{enumerate}
-                            \end{enumerate}
-                    \end{enumerate}
-        \end{enumerate}
-
-        % Przeanalizujmy powyższy algorytm. 
-
-        % Sprawdzamy najpierw czy $P_0$ nie jest szukanym punktem. Jest nim wtedy, gdy 
+        
+        
     \subsubsection{Złożoność}
-        Posortowanie punktów zajmuje $O(n \, lgn)$. Każde wykonanie pętli zajmuje czas logarytmiczny względem liczebności otoczki
-        znanej w danej iteracji. Zatem złożoność algorytmu jest rzędu $O(n \, lgn)$\\
+        Posortowanie punktów zajmuje $O(n \, lgn)$. Wydaje główna pętla programu wykonuje się w czasie $O(n)$, ponieważ możemy usunąć maksymalnie $k-3$ punkty (gdy $k$ jest liczebnością 
+        zbioru punktów otoczki znaną w danej iteracji), ale zauważmy, że każdy z punktów usuwany jest co najwyżej raz. Wyszukanie stycznych w głównej pętli także zajmuje 
+        czas liniowy, więc główna pętla programu wykonuje się w czasie liniowym. Zatem złożoność algorytmu jest rzędu $O(n \, lgn)$\\
 
     \subsubsection{Kod}
 
 \begin{lstlisting}[language=Python]
-def right_tangent(polygon: ListOfPoints, point: Point) -> Union[int, None]:
-    n = len(polygon)
-
-    if n < 3: return None
-
-    if orientation(polygon[0], polygon[1], point) == 1 and orientation(polygon[-1], polygon[0], point) == -1:
-        return 0
-    
-    left = 0
-    right = n
-    
-    while True:
-        mid = (left + right) // 2
-        
-        is_mid_down: bool = (orientation(polygon[mid], polygon[(mid + 1) % n], point) == 1)
-        
-        if is_mid_down and orientation(polygon[mid - 1], polygon[mid], point) == -1: 
-            return mid % n
-        
-        is_left_up: bool = (orientation(polygon[left % n], polygon[(left + 1) % n], point) == -1)
-        
-        if is_left_up:
-            if is_mid_down:
-                right = mid
-            else:
-                if orientation(point, polygon[left], polygon[mid]) == 1:
-                    right = mid
-                else:
-                    left = mid
-        else:
-            if not is_mid_down:
-                left = mid
-            else:
-                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
-                    right = mid
-                else:
-                    left = mid
-                    
-    
-def left_tangent(polygon: ListOfPoints, point: Point) -> Union[Point, None]:
+def rltangent(polygon: ListOfPoints, point: Point):
     n = len(polygon)
     
-    if n < 3: return None
-
-    left = 0
-    right = n
+    right = index_of_max(polygon, cmp_idx=0)
     
-    if orientation(point, polygon[1], polygon[0]) == 1 and orientation(point, polygon[-1], polygon[0]) == 1:
-        return 0
+    left = right
     
-    while True:
-        mid = (left + right) // 2
+    left_orient = orientation(point, polygon[left % n], polygon[(left-1)%n])  
+    while left_orient != -1:
+        if left_orient == 0 and dist_sq(point, polygon[left]) >= dist_sq(point, polygon[(left-1)%n]):
+            break
+        left = (left-1) % n
+        left_orient = orientation(point, polygon[left % n], polygon[(left-1)%n]) 
+        
+    right_orient = orientation(point, polygon[right%n], polygon[(right+1)%n]) 
+    while right_orient != 1:
+        if right_orient == 0 and dist_sq(point, polygon[right]) >= dist_sq(point, polygon[(right+1)%n]):
+            break
+        right = (right+1)%n
+        right_orient = orientation(point, polygon[right%n], polygon[(right+1)%n]) 
+        
+        
+    return left, right
 
-        is_mid_down: bool = (orientation(point, polygon[mid % n], polygon[(mid + 1) % n]) == 1)
-        
-        if (not is_mid_down) and orientation(point, polygon[(mid - 1) % n], polygon[mid % n]) == 1:
-            return mid % n
-        
-        is_left_down: bool = (orientation(point, polygon[left], polygon[(left + 1) % n]) == 1)
-        
-        if is_left_down:
-            if not is_mid_down:
-                right = mid
-            else:
-                if orientation(point, polygon[mid % n], polygon[left % n]) == 1:
-                    right = mid
-                else:
-                    left = mid
-        else:
-            if is_mid_down:
-                left = mid
-            else:
-                if orientation(point, polygon[left % n], polygon[mid % n]) == 1:
-                    right = mid
-                else:
-                    left = mid
-
-        
+    
 def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
     if len( point2_set ) < 3: return None
     
@@ -600,27 +501,31 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
         convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
     
     for i in range(3, len( point2_set )):
-        left_tangent_idx = left_tangent(convex_hull, point2_set[i])
-        right_tangent_idx = right_tangent(convex_hull, point2_set[i])
-        
+        rltang = rltangent(convex_hull, point2_set[i])
+        left_tangent_idx = rltang[0]
+        right_tangent_idx = rltang[1]
+
         left_tangent_point = convex_hull[left_tangent_idx]
         right_tangent_point = convex_hull[right_tangent_idx]        
 
-        deletion_side: Literal[-1, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
+        deletion_side: Literal[-1, 0, 1] = orientation(left_tangent_point, right_tangent_point, point2_set[i])
 
-        if orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)]) == deletion_side:
-            step = 0
-        else: 
-            step = -1
+        if deletion_side != 0:
+            lrlnext_orient = orientation(left_tangent_point, right_tangent_point, convex_hull[(left_tangent_idx + 1) % len(convex_hull)])
+            if lrlnext_orient == deletion_side or lrlnext_orient == 0:
+                step = 0
+            else: 
+                step = -1
+                
+            left = (left_tangent_idx + 1) % len(convex_hull)
             
-        left = (left_tangent_idx + 1) % len(convex_hull)
-        
-        while convex_hull[left] != right_tangent_point:
-            convex_hull.pop(left)
-            left = (left + step) % len(convex_hull)
-            
-        convex_hull.insert(left, point2_set[i])
-
+            while convex_hull[left % len(convex_hull)] != right_tangent_point:
+                convex_hull.pop(left % len(convex_hull))
+                left = (left + step) % len(convex_hull)
+                
+            convex_hull.insert(left % len(convex_hull), point2_set[i])
+        else:
+            convex_hull = [point2_set[left_tangent_idx], point2_set[i]]
     return convex_hull
 \end{lstlisting}
 
@@ -864,11 +769,11 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
     \begin{itemize}
         \item Złożoność pierwsszej części składa się na :
                 \begin{itemize}
-                    \item   Podział zbioru punktów na podzbiory O(n);
-                    \item   Wyznaczenie otoczek dla podzbiorów. Mamy ceil(n/m) podzbiorów
+                    \item   Podział zbioru punktów na podzbiory $O(n)$;
+                    \item   Wyznaczenie otoczek dla podzbiorów. Mamy $\lceil \frac{n}{m} \rceil$ podzbiorów
                             rozmiaru m, dla każdego z nich wyznaczamy otoczkę algorytmem Grahama.
-                            Algorytm Grahama działa O(nlog(n)). Więc łącznie mamy O(ceil(n/m)*mlog(m))=
-                            O(nlog(m)).
+                            Algorytm Grahama działa $O(nlog(n))$. Więc łącznie mamy O(ceil(n/m)*mlog(m))=
+                            $O(nlog(m))$.
                 \end{itemize}
                 Łącznie dla pierewszej części mamy O(nlog(m)), gdzie m jest wybranym maksymalnym
                  rozmiarem podzbiorów.
@@ -1042,7 +947,430 @@ def chan(points):
         considering.remove(b)
 \end{lstlisting}
 
-    \medskip
+ \medskip
+
+\section{Wydajność algorytmów}
+
+Testy prowadzone były na następujących zbiorach:
+
+\begin{itemize}
+    \item   Testy odbywały się na 4-rech typach zbiorów:
+        \begin{itemize}
+            \item   typ A - losowo rozłożone punkty płaszczyzny o określonych zakresach współrzędnych
+            \item   typ B - losowo rozłożone punkty leżące na okręgu o zadanych parametrach
+            \item   typ C - losowo rozłożone punkty leżące na bokach prostokąta o zadanych parametrach
+            \item   typ D - losowo rozłożone punkty leżące na 2 bokach kwadratu, umiejscowionego tak,
+                    że te dwa boki pokrywają sie z osiami układu oraz na jego przekątnych \\
+        \end{itemize}
+\end{itemize}
+
+
+Charakterystyki zbiorów zostały dobrane w taki sposób aby odzwierciedlać możliwie różne zachowanie się  poszczególnych algorytmów w zależności od ilości przypadków zdegenerowanych (liczebność 
+współliniowych otoczek), ilości potrzebnych do wykonania porównań i operacji. Bardziej szczegółowe omówienie charakterystyki algorytmów dla poszczególnych zbiorów znajduje się w kolejnych sekcjach. 
+
+
+
+\subsection{Algorytm Grahama}
+
+W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-graham}, 
+\ref{fig:okrag-graham}, \ref{fig:prost-graham}, \ref{fig:kw-graham} widzimy ilustrację danych z tabeli \ref{tab:graham}.
+
+
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu Grahama w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:graham}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+ & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+ & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania [s]} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.0239 & 0.0331 & 0.045 & 0.0586 & 0.072 & 0.0847 & 0.0983 & 0.1122 & 0.1273 & 0.141 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.0191 & 0.0299 & 0.0413 & 0.0531 & 0.0637 & 0.0768 & 0.0908 & 0.0973 & 0.122 & 0.1284 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.069 & 0.1115 & 0.1392 & 0.1878 & 0.2349 & 0.2736 & 0.3153 & 0.351 & 0.3988 & 0.4601 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.4256 & 0.6523 & 0.924 & 1.2255 & 1.4233 & 1.8752 & 1.9285 & 2.3207 & 2.5692 & 2.88 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-graham.png} % first figure itself
+        \caption{Zbiór typu A, algorytm Grahama}
+        \label{fig:chmura-graham}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-graham.png} % second figure itself
+        \caption{Zbiór typu B, algorytm Grahama}
+        \label{fig:okrag-graham}
+    \end{minipage}
+\end{figure}
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-graham.png} % first figure itself
+        \caption{Zbiór typu C, algorytm Grahama}
+        \label{fig:prost-graham}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-graham.png} % second figure itself
+        \caption{Zbiór typu D, algorytm Grahama}
+        \label{fig:kw-graham}
+    \end{minipage}
+\end{figure}
+
+\subsection{Algorytm górna-dolna}
+
+W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna-dolna dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-lowerupper}, 
+\ref{fig:okrag-lowerupper}, \ref{fig:prost-lowerupper}, \ref{fig:kw-lowerupper} widzimy ilustrację danych z tabeli \ref{tab:lowerupper}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu górna-dolna w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:lowerupper}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania [s]} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.0076 & 0.0079 & 0.0105 & 0.0134 & 0.016 & 0.0186 & 0.0222 & 0.0241 & 0.0269 & 0.0295 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.004 & 0.0064 & 0.0086 & 0.0111 & 0.0132 & 0.0164 & 0.018 & 0.0203 & 0.0229 & 0.0254 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.0155 & 0.0241 & 0.0321 & 0.0388 & 0.0486 & 0.0549 & 0.0651 & 0.0711 & 0.0784 & 0.084 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.0635 & 0.0927 & 0.1261 & 0.1566 & 0.1875 & 0.2217 & 0.259 & 0.2897 & 0.316 & 0.3495 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-lowerupper.png} % first figure itself
+        \caption{Zbiór typu A, algorytm górna-dolna}
+        \label{fig:chmura-lowerupper}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-lowerupper.png} % second figure itself
+        \caption{Zbiór typu B, algorytm górna-dolna}
+        \label{fig:okrag-lowerupper}
+    \end{minipage}
+\end{figure}
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-lowerupper.png} % first figure itself
+        \caption{Zbiór typu C, algorytm górna-dolna}
+        \label{fig:prost-lowerupper}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-lowerupper.png} % second figure itself
+        \caption{Zbiór typu D, algorytm górna-dolna}
+        \label{fig:kw-lowerupper}
+    \end{minipage}
+\end{figure}
+
+
+\subsection{Algorytm Chana}
+
+W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-chan}, 
+\ref{fig:okrag-chan}, \ref{fig:prost-chan}, \ref{fig:kw-chan} widzimy ilustrację danych z tabeli \ref{tab:chan}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu Chana w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:chan}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.1055 & 0.1544 & 0.3575 & 0.2408 & 0.5449 & 0.6155 & 0.7104 & 0.7904 & 0.8621 & 0.9826 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.3714 & 0.5483 & 0.6962 & 0.8893 & 1.0799 & 1.2537 & 1.415 & 1.827 & 1.7746 & 1.9095 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.2457 & 0.5615 & 0.727 & 0.9188 & 1.1007 & 1.3044 & 1.5073 & 1.6875 & 1.88 & 2.1234 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.6322 & 0.9372 & 1.2306 & 2.1543 & 2.8556 & 6.0844 & 2.4157 & 3.943 & 3.094 & 4.7075 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-chan.png} % first figure itself
+        \caption{Zbiór typu A, algorytm Chana}
+        \label{fig:chmura-chan}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-chan.png} % second figure itself
+        \caption{Zbiór typu B, algorytm Chana}
+        \label{fig:okrag-chan}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-chan.png} % first figure itself
+        \caption{Zbiór typu C, algorytm Chana}
+        \label{fig:prost-chan}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-chan.png} % second figure itself
+        \caption{Zbiór typu D, algorytm Chana}
+        \label{fig:kw-chan}
+    \end{minipage}
+\end{figure}
+
+\subsection{Algorytm QuickHull}
+
+W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHull dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-quickhull}, 
+\ref{fig:okrag-quickhull}, \ref{fig:prost-quickhull}, \ref{fig:kw-quickhull} widzimy ilustrację danych z tabeli \ref{tab:quickhull}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu QuickHull w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:quickhull}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.0031 & 0.0047 & 0.0058 & 0.0067 & 0.012 & 0.0098 & 0.0134 & 0.0124 & 0.0136 & 0.0155 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.0027 & 0.004 & 0.0055 & 0.0082 & 0.0089 & 0.011 & 0.0116 & 0.0133 & 0.0135 & 0.0153 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.0064 & 0.0092 & 0.0148 & 0.0153 & 0.0207 & 0.0222 & 0.0256 & 0.0282 & 0.0319 & 0.0348 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.0287 & 0.0426 & 0.0551 & 0.0702 & 0.0847 & 0.0986 & 0.1143 & 0.1294 & 0.1411 & 0.1562 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-quickhull.png} % first figure itself
+        \caption{Zbiór typu A, algorytm QuickHull}
+        \label{fig:chmura-quickhull}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-quickhull.png} % second figure itself
+        \caption{Zbiór typu B, algorytm QuickHull}
+        \label{fig:okrag-quickhull}
+    \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-quickhull.png} % first figure itself
+        \caption{Zbiór typu C, algorytm QuickHull}
+        \label{fig:prost-quickhull}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-quickhull.png} % second figure itself
+        \caption{Zbiór typu D, algorytm QuickHull}
+        \label{fig:kw-quickhull}
+    \end{minipage}
+\end{figure}
+
+
+\subsection{Algorytm dziel i zwyciężaj}
+
+W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-dziel}, 
+\ref{fig:okrag-dziel}, \ref{fig:prost-dziel}, \ref{fig:kw-dziel} widzimy ilustrację danych z tabeli \ref{tab:dziel}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu dziel i zwyciężaj w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:dziel}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.0163 & 0.0251 & 0.0341 & 0.0439 & 0.0569 & 0.0631 & 0.0748 & 0.0844 & 0.0955 & 0.1076 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.0173 & 0.0234 & 0.0339 & 0.0381 & 0.052 & 0.0562 & 0.0675 & 0.0754 & 0.0829 & 0.0992 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.0441 & 0.0683 & 0.0877 & 0.1189 & 0.1516 & 0.1863 & 0.2067 & 0.2437 & 0.27 & 0.3132 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.1634 & 0.2474 & 0.3518 & 0.4703 & 0.5694 & 0.6705 & 0.7849 & 0.8928 & 1.0458 & 1.1565 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-dziel.png} % first figure itself
+        \caption{Zbiór typu A, algorytm dziel i zwyciężaj }
+        \label{fig:chmura-dziel}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-dziel.png} % second figure itself
+        \caption{Zbiór typu B, algorytm dziel i zwyciężaj}
+        \label{fig:okrag-dziel}
+    \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-dziel.png} % first figure itself
+        \caption{Zbiór typu C, algorytm dziel i zwyciężaj}
+        \label{fig:prost-dziel}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-dziel.png} % second figure itself
+        \caption{Zbiór typu D, algorytm dziel i zwyciężaj}
+        \label{fig:kw-dziel}
+    \end{minipage}
+\end{figure}
+
+\subsection{Algorytm przyrostowy}
+
+
+W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrostowy i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-przyrost}, 
+\ref{fig:okrag-przyrost}, \ref{fig:prost-przyrost}, \ref{fig:kw-przyrost} widzimy ilustrację danych z tabeli \ref{tab:przyrost}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu przyrostowego w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:przyrost}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ zbioru} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.0125 & 0.0194 & 0.0251 & 0.0305 & 0.0377 & 0.0431 & 0.0497 & 0.0584 & 0.0621 & 0.0705 \\ \hline
+\multicolumn{1}{|c|}{B} & 0.0864 & 0.1788 & 0.2978 & 0.4428 & 0.6359 & 0.7745 & 0.9738 & 1.1858 & 1.3526 & 1.5613 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.0315 & 0.0475 & 0.063 & 0.0793 & 0.0997 & 0.1136 & 0.1292 & 0.1449 & 0.1555 & 0.1742 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.1373 & 0.1992 & 0.2715 & 0.326 & 0.4165 & 0.4639 & 0.5195 & 0.5937 & 0.6773 & 0.7446 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-przyrost.png} % first figure itself
+        \caption{Zbiór typu A, algorytm przyrostowy}
+        \label{fig:chmura-przyrost}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-przyrost.png} % second figure itself
+        \caption{Zbiór typu B, algorytm przyrostowy}
+        \label{fig:okrag-przyrost}
+    \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-przyrost.png} % first figure itself
+        \caption{Zbiór typu C, algorytm przyrostowy}
+        \label{fig:prost-przyrost}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-przyrost.png} % second figure itself
+        \caption{Zbiór typu D, algorytm przyrostowy}
+        \label{fig:kw-przyrost}
+    \end{minipage}
+\end{figure}
+
+\subsection{Algorytm Jarvisa}
+
+W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-jarvis}, 
+\ref{fig:okrag-jarvis}, \ref{fig:prost-jarvis}, \ref{fig:kw-jarvis} widzimy ilustrację danych z tabeli \ref{tab:jarvis}.
+
+\begin{table}[]
+\centering
+\caption{Czas wykonania algorytmu Jarvisa w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
+\label{tab:jarvis}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Typ danych} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{A} & 0.1379 & 0.2058 & 0.2217 & 0.213 & 0.3311 & 0.3635 & 0.307 & 0.3775 & 0.3808 & 0.3825 \\ \hline
+\multicolumn{1}{|c|}{B} & 5.6845 & 12.8821 & 22.7307 & 35.6488 & 51.3054 & 69.4251 & 90.2278 & 113.8051 & 141.2752 & 169.5891 \\ \hline
+\multicolumn{1}{|c|}{C} & 0.0529 & 0.077 & 0.1046 & 0.1306 & 0.1543 & 0.184 & 0.2086 & 0.2304 & 0.2571 & 0.2858 \\ \hline
+\multicolumn{1}{|c|}{D} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-jarvis.png} % first figure itself
+        \caption{Zbiór typu A, algorytm Jarvisa}
+        \label{fig:chmura-jarvis}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-jarvis.png} % second figure itself
+        \caption{Zbiór typu B, algorytm Jarvisa}
+        \label{fig:okrag-jarvis}
+    \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-jarvis.png} % first figure itself
+        \caption{Zbiór typu C, algorytm Jarvisa}
+        \label{fig:prost-jarvis}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-jarvis.png} % second figure itself
+        \caption{Zbiór typu D, algorytm Jarvisa}
+        \label{fig:kw-jarvis}
+    \end{minipage}
+\end{figure}
+
+
+
+\section{Porównanie algorytmów}
+
+
+
+\section{Bibliografia}
+
+\begin{enumerate}
+    \item   \emph{Wykład z przedmiotu Algorytmy Geometryczne, Informatyka 3. sem., 1. st. AGH, Barbara Głut}
+    \item   \emph{Computational Geometry -- Algorithms and Applications, Mark de Berg, Otfried Cheong, Marc van Kreveld, Mark Overmars} 
+    \item   \begin{verbatim} https://jeffe.cs.illinois.edu/teaching/compgeom/notes/01-convexhull.pdf \end{verbatim}
+\end{enumerate}
+
 
 % \printbibliographyy
 
