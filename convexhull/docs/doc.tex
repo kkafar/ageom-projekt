@@ -1317,7 +1317,7 @@ W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i 
 \multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
 \multicolumn{1}{|c|}{Typ danych} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
 \multicolumn{1}{|c|}{A} & 0.1379 & 0.2058 & 0.2217 & 0.213 & 0.3311 & 0.3635 & 0.307 & 0.3775 & 0.3808 & 0.3825 \\ \hline
-\multicolumn{1}{|c|}{B} & 5.6845 & 12.8821 & 22.7307 & 35.6488 & 51.3054 & 69.4251 & 90.2278 & 113.8051 & 141.2752 & 169.5891 \\ \hline
+\multicolumn{1}{|c|}{B} & 5.684 & 12.882 & 22.737 & 35.648 & 51.305 & 69.425 & 90.227 & 113.80 & 141.27 & 169.58 \\ \hline
 \multicolumn{1}{|c|}{C} & 0.0529 & 0.077 & 0.1046 & 0.1306 & 0.1543 & 0.184 & 0.2086 & 0.2304 & 0.2571 & 0.2858 \\ \hline
 \multicolumn{1}{|c|}{D} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
 \end{tabular}
@@ -1361,6 +1361,175 @@ W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i 
 
 \section{Porównanie algorytmów}
 
+Ze względu na różną charakterystykę zbiorów punktów i zachowania algorytmów, porównania dzielimy na 4 sekcje, każda odpowiadająca wybranemu typowi zbioru punktów testowych. 
+
+Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych algorytmów:
+
+\begin{itemize}
+    \item $GR$ -- algorytm Grahama
+    \item $LU$ -- algorytm górna dolna 
+    \item $CH$ -- algorytm Chana
+    \item $QH$ -- algorytm QuickHull
+    \item $DC$ -- algorytm dziel i zwyciężaj 
+    \item $IN$ -- algorytm przyrostowy
+    \item $JR$ -- algorytm Jarvisa
+\end{itemize}
+
+
+\subsection{Zbiór typu A}
+
+\begin{table}[]
+\centering
+\caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu A przy różnych mocach zbiorów punktów.}
+\label{tab:chmura}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Algorytm} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{$GR$} & 0.0239 & 0.0331 & 0.045 & 0.0586 & 0.072 & 0.0847 & 0.0983 & 0.1122 & 0.1273 & 0.141 \\ \hline
+\multicolumn{1}{|c|}{$LU$} & 0.0076 & 0.0079 & 0.0105 & 0.0134 & 0.016 & 0.0186 & 0.0222 & 0.0241 & 0.0269 & 0.0295 \\ \hline
+\multicolumn{1}{|c|}{$CH$} & 0.1055 & 0.1544 & 0.3575 & 0.2408 & 0.5449 & 0.6155 & 0.7104 & 0.7904 & 0.8621 & 0.9826 \\ \hline
+\multicolumn{1}{|c|}{$QH$} & 0.0031 & 0.0047 & 0.0058 & 0.0067 & 0.012 & 0.0098 & 0.0134 & 0.0124 & 0.0136 & 0.0155 \\ \hline
+\multicolumn{1}{|c|}{$DC$} & 0.0163 & 0.0251 & 0.0341 & 0.0439 & 0.0569 & 0.0631 & 0.0748 & 0.0844 & 0.0955 & 0.1076 \\ \hline
+\multicolumn{1}{|c|}{$IN$} & 0.0125 & 0.0194 & 0.0251 & 0.0305 & 0.0377 & 0.0431 & 0.0497 & 0.0584 & 0.0621 & 0.0705 \\ \hline
+\multicolumn{1}{|c|}{$JR$} & 0.1379 & 0.2058 & 0.2217 & 0.213 & 0.3311 & 0.3635 & 0.307 & 0.3775 & 0.3808 & 0.3825 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-zbiorczy.png} % first figure itself
+        \caption{Zbiór typu A, zestawienie}
+        \label{fig:chmura-zbiorczy}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/chmura-zbiorczy-2.png} % second figure itself
+        \caption{Zbiór typu A, zestawienie bez Jarvisa i Chana}
+        \label{fig:chmura-zbiorczy-2}
+    \end{minipage}
+\end{figure}
+
+
+
+\subsection{Zbiór typu B}
+
+
+\begin{table}[]
+\centering
+\caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu B przy różnych mocach zbiorów punktów. }
+\label{tab:okrag}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Algorytm} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{$GR$} & 0.0191 & 0.0299 & 0.0413 & 0.0531 & 0.0637 & 0.0768 & 0.0908 & 0.0973 & 0.122 & 0.1284 \\ \hline
+\multicolumn{1}{|c|}{$LU$} & 0.004 & 0.0064 & 0.0086 & 0.0111 & 0.0132 & 0.0164 & 0.018 & 0.0203 & 0.0229 & 0.0254 \\ \hline
+\multicolumn{1}{|c|}{$CH$} & 0.3714 & 0.5483 & 0.6962 & 0.8893 & 1.0799 & 1.2537 & 1.415 & 1.827 & 1.7746 & 1.9095 \\ \hline
+\multicolumn{1}{|c|}{$QH$} & 0.0027 & 0.004 & 0.0055 & 0.0082 & 0.0089 & 0.011 & 0.0116 & 0.0133 & 0.0135 & 0.0153 \\ \hline
+\multicolumn{1}{|c|}{$DC$} & 0.0173 & 0.0234 & 0.0339 & 0.0381 & 0.052 & 0.0562 & 0.0675 & 0.0754 & 0.0829 & 0.0992 \\ \hline
+\multicolumn{1}{|c|}{$IN$} & 0.0864 & 0.1788 & 0.2978 & 0.4428 & 0.6359 & 0.7745 & 0.9738 & 1.1858 & 1.3526 & 1.5613 \\ \hline
+\multicolumn{1}{|c|}{$JR$} & 5.68 & 12.88 & 22.73 & 35.64 & 51.30 & 69.42 & 90.22 & 113.80 & 141.27 & 169.58 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-zbiorcze.png} % first figure itself
+        \caption{Zbiór typu B, zestawienie}
+        \label{fig:okrag-zbiorczy}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/okrag-zbiorcze-2.png} % second figure itself
+        \caption{Zbiór typu B, zestawienie bez Jarvisa}
+        \label{fig:okrag-zbiorczy-2}
+    \end{minipage}
+\end{figure}
+
+
+\subsection{Zbiór typu C}
+
+\begin{table}[]
+\centering
+\caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu C przy różnych mocach zbiorów punktów.}
+\label{tab:prost}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Algorytm} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{$GR$} & 0.069 & 0.1115 & 0.1392 & 0.1878 & 0.2349 & 0.2736 & 0.3153 & 0.351 & 0.3988 & 0.4601 \\ \hline
+\multicolumn{1}{|c|}{$LU$} & 0.0155 & 0.0241 & 0.0321 & 0.0388 & 0.0486 & 0.0549 & 0.0651 & 0.0711 & 0.0784 & 0.084 \\ \hline
+\multicolumn{1}{|c|}{$CH$} & 0.2457 & 0.5615 & 0.727 & 0.9188 & 1.1007 & 1.3044 & 1.5073 & 1.6875 & 1.88 & 2.1234 \\ \hline
+\multicolumn{1}{|c|}{$QH$} & 0.0064 & 0.0092 & 0.0148 & 0.0153 & 0.0207 & 0.0222 & 0.0256 & 0.0282 & 0.0319 & 0.0348 \\ \hline
+\multicolumn{1}{|c|}{$DC$} & 0.0441 & 0.0683 & 0.0877 & 0.1189 & 0.1516 & 0.1863 & 0.2067 & 0.2437 & 0.27 & 0.3132 \\ \hline
+\multicolumn{1}{|c|}{$IN$} & 0.0315 & 0.0475 & 0.063 & 0.0793 & 0.0997 & 0.1136 & 0.1292 & 0.1449 & 0.1555 & 0.1742 \\ \hline
+\multicolumn{1}{|c|}{$JR$} & 0.0529 & 0.077 & 0.1046 & 0.1306 & 0.1543 & 0.184 & 0.2086 & 0.2304 & 0.2571 & 0.2858 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-zbiorczy.png} % first figure itself
+        \caption{Zbiór typu C, zestawienie}
+        \label{fig:prost-zbiorczy}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/prost-zbiorczy-2.png} % second figure itself
+        \caption{Zbiór typu C, zestawienie bez Chana}
+        \label{fig:prost-zbiorczy-2}
+    \end{minipage}
+\end{figure}
+
+\subsection{Zbiór typu D}
+
+
+\begin{table}[]
+\centering
+\caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu D przy różnych mocach zbiorów punktów.}
+\label{tab:kw}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-11}
+\multicolumn{1}{l|}{} & \multicolumn{10}{c|}{Liczba punktów} \\ \cline{2-11} 
+\multicolumn{1}{l|}{} & 1000 & 1500 & 2000 & 2500 & 3000 & 3500 & 4000 & 4500 & 5000 & 5500 \\ \hline
+\multicolumn{1}{|c|}{Algorytm} & \multicolumn{10}{c|}{Czas wykonania {[}s{]}} \\ \hline
+\multicolumn{1}{|c|}{$GR$} & 0.4256 & 0.6523 & 0.924 & 1.2255 & 1.4233 & 1.8752 & 1.9285 & 2.3207 & 2.5692 & 2.88 \\ \hline
+\multicolumn{1}{|c|}{$LU$} & 0.0635 & 0.0927 & 0.1261 & 0.1566 & 0.1875 & 0.2217 & 0.259 & 0.2897 & 0.316 & 0.3495 \\ \hline
+\multicolumn{1}{|c|}{$CH$} & 0.6322 & 0.9372 & 1.2306 & 2.1543 & 2.8556 & 6.0844 & 2.4157 & 3.943 & 3.094 & 4.7075 \\ \hline
+\multicolumn{1}{|c|}{$QH$} & 0.0287 & 0.0426 & 0.0551 & 0.0702 & 0.0847 & 0.0986 & 0.1143 & 0.1294 & 0.1411 & 0.1562 \\ \hline
+\multicolumn{1}{|c|}{$DC$} & 0.1634 & 0.2474 & 0.3518 & 0.4703 & 0.5694 & 0.6705 & 0.7849 & 0.8928 & 1.0458 & 1.1565 \\ \hline
+\multicolumn{1}{|c|}{$IN$} & 0.1373 & 0.1992 & 0.2715 & 0.326 & 0.4165 & 0.4639 & 0.5195 & 0.5937 & 0.6773 & 0.7446 \\ \hline
+\multicolumn{1}{|c|}{$JR$} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-zbiorczy.png} % first figure itself
+        \caption{Zbiór typu D, zestawienie}
+        \label{fig:kw-zbiorczy}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{../tests/kw-zbiorczy-2.png} % second figure itself
+        \caption{Zbiór typu D, zestawienie bez Chana}
+        \label{fig:kw-zbiorczy-2}
+    \end{minipage}
+\end{figure}
 
 
 \section{Bibliografia}
