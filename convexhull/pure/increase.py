@@ -20,27 +20,16 @@ def rltangent(polygon: ListOfPoints, point: Point):
     
     left = right
     
-    # print('wyznaczam styczne do')
-    # pprint(polygon)
-    # print('punkt odniesienia', point)
-
-    
-    # print('lewa styczna')
     left_orient = orientation(point, polygon[left % n], polygon[(left-1)%n])  
     while left_orient != -1:
-        # print(f'{polygon[(left-1)%n]} NIE po prawej {point} -> {polygon[left%n]}')
         if left_orient == 0 and dist_sq(point, polygon[left]) >= dist_sq(point, polygon[(left-1)%n]):
-            # print('przerywam dzialanie petli left')
             break
         left = (left-1) % n
         left_orient = orientation(point, polygon[left % n], polygon[(left-1)%n]) 
         
-    # print('prawa styczna')
     right_orient = orientation(point, polygon[right%n], polygon[(right+1)%n]) 
     while right_orient != 1:
-        # print(f'{polygon[(right+1)%n]} NIE po lewej {point} -> {polygon[right%n]}')
         if right_orient == 0 and dist_sq(point, polygon[right]) >= dist_sq(point, polygon[(right+1)%n]):
-            # print('przerywam dzialanie petli right')
             break
         right = (right+1)%n
         right_orient = orientation(point, polygon[right%n], polygon[(right+1)%n]) 
@@ -53,47 +42,19 @@ def rltangent(polygon: ListOfPoints, point: Point):
 def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]:
     if len( point2_set ) < 3: return None
     
-    # posortowanie punktów po wsp. x na początku, pozwoli na pominięcie kroku z sprawdzaniem należenia punktu do wnętrza otoczki 
-    # ponieważ biorąc każdy kolejny punkt, mamy gwarancję, że nie należy od do obecnie rozważanej otoczki
-    
     point2_set.sort(key = operator.itemgetter(0, 1))
     
-    # bierzemy pierwsze 3 punkty i tworzymy z nich otoczkę
     convex_hull = point2_set[:3]
-
-    # pprint(convex_hull)
 
     # musimy zapewnić, że wierzchołki wyjściowej otoczki są podane w kolejności przeciwnej do ruchu wskazówek zegara 
     if orientation(convex_hull[0], convex_hull[1], convex_hull[2]) == -1:
         convex_hull[1], convex_hull[2] = convex_hull[2], convex_hull[1]
     
     for i in range(3, len( point2_set )):
-        # znajdujemy styczne
-        # print('obecnie znana otoczka')
-        # pprint(convex_hull)
-
         rltang = rltangent(convex_hull, point2_set[i])
-        # print(f'szukam lewej stycznej z {point2_set[i]}')
-        # left_tangent_idx = left_tangent(convex_hull, point2_set[i])
-        # left_tangent_idx = tangent_l(point2_set[i], convex_hull)
-        # left_tangent_idx = ltangent(convex_hull, point2_set[i])
         left_tangent_idx = rltang[0]
-            
-        # print(f'szukam prawej stycznej z {point2_set[i]}') 
-        # right_tangent_idx = right_tangent(convex_hull, point2_set[i])
-        # right_tangent_idx = tangent_r(point2_set[i], convex_hull)
-        # right_tangent_idx = rtangent(convex_hull, point2_set[i])
         right_tangent_idx = rltang[1]
-        
-        # print('znalezione styczne')
-        # print(convex_hull[left_tangent_idx])
-        # print(convex_hull[right_tangent_idx])
-        
-        # if right_tangent_idx is None:
-        #     print('nie znaleziono prawej stycznej')
-        # else:
-        #     print(f'znaleziono prawa styczna {right_tangent_idx}')
-        # aktualizujemy otoczkę (TODO PYTANIE czy da się aktualizować otoczkę w czasie stałym?)
+
         left_tangent_point = convex_hull[left_tangent_idx]
         right_tangent_point = convex_hull[right_tangent_idx]        
 
