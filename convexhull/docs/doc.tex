@@ -58,15 +58,15 @@
 
 \lstset{style=mystyle}
 
-\author{K. Kafara\\Ł. Czarniecki}
-\title{\textbf{Otoczka wypukła dla zbioru punktów w przestrzeni dwuwymiarowej}\\Dokumentacja projektu\\Algorytmy geometryczne}
+\author{Kacper Kafara\\Łukasz Czarniecki}
+\title{\textbf{DOKUMENTACJA PROJEKTU}\\\textbf{Otoczka wypukła dla zbioru punktów w przestrzeni dwuwymiarowej}\\Algorytmy geometryczne\\Informatyka 3. sem., 1. st., AGH}
 \date{}
 
 \begin{document}
 
 \maketitle
 
-
+\newpage
 
 \tableofcontents
 
@@ -82,12 +82,13 @@
 
 \subsection{Budowa programu}
 
-Program złożony jest z następujących modułów: 
+Program złożony jest z następujących części:
 
 \begin{itemize}
-    \item   \emph{lib} -- biblioteczny -- zawiera zbiór pomocniczych funkcji i struktur danych wykorzystywanych przez algorytmy.
-    \item   \emph{pure} -- algorytmy w \emph{czystej postaci} tj. nie posiadające części wizualizacyjnej. 
-    \item   \emph{vis} -- algorytmy wraz z kodem odpowiadającym za wizualizację
+    \item   \emph{lib} -- moduł biblioteczny -- zawiera zbiór pomocniczych funkcji i struktur danych wykorzystywanych przez algorytmy
+    \item   \emph{pure} -- moduł z algorytmami w \emph{czystej postaci} tj. nie posiadające części wizualizacyjnej
+    \item   \emph{vis} -- moduł z algorytmami wraz z kodem odpowiadającym za wizualizację
+    \item   \emph{kafara\_czarniecki\_program.ipynb} -- główny plik programu, notebook z prezentacją algorytmów
 \end{itemize}
 
 
@@ -99,13 +100,501 @@ Moduł zawiera w sobie następujące podmoduły:
 
 \begin{enumerate}
     \item   \emph{geometric\_tool\_lab.py} -- narzędzie graficzne dostarczone w ramach przedmiotu \emph{Algorytmy geometryczne}
-    \item   \emph{getrand.py} -- zawiera funkcje generujące zbiory punktów różnych typów 
-    \item   \emph{sorting.py} -- zawiera implementację iteracyjnej wersji algorytmu \emph{QuickSort} wykorzystywaną m.in w algorytmie Grahama
-    \item   \emph{stack.py} -- zawiera klasę implementującą \emph{stos}
-    \item   \emph{util.py} -- zawiera szereg funkcji pomocniczych wykorzystywanych przez zaimplementowane algorytmy
-    \item   \emph{mytypes.py} -- zawiera definicje typów stworzone w celu zwiększenia czytelności kodu
+    \item   \emph{getrand.py} -- funkcje generujące zbiory punktów różnych typów 
+    \item   \emph{sorting.py} -- implementację iteracyjnej wersji algorytmu \emph{QuickSort} wykorzystywaną w algorytmie Grahama
+    \item   \emph{stack.py} -- klasę implementującą \emph{stos}
+    \item   \emph{util.py} --  szereg funkcji pomocniczych wykorzystywanych przez zaimplementowane algorytmy
+    \item   \emph{mytypes.py} --  definicje typów stworzone w celu zwiększenia czytelności kodu.
+    \item   \emph{timemeasure.py} --  funkcje do pomiaru czasu wykonania algorytmów
+    \item   \emph{tangent.py} -- metoda wyznaczająca styczną (punkt styczności) do wielokąta, przechodzącą przez zadany punkt
+    % \item   \emph{divide.py}
 \end{enumerate}
 
+\subsubsection*{Kod modułu \emph{mytypes}}
+\begin{lstlisting}[language=Python]
+from typing import Tuple, List
+
+Point = Tuple[float, float]
+
+Segment = Tuple[Point, Point]
+
+ListOfPoints = List[Point] 
+
+ListOfSegments = List[Segment]
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{getrand}}
+\begin{lstlisting}[language=Python]
+import numpy as np
+from typing import Tuple
+from numpy import random
+
+def dist(point_a, point_b):
+    return np.sqrt((point_a[0] - point_b[0])** 2 + (point_a[1] - point_b[1])**2)
+
+def rand_seg_point(point_a, point_b):
+    rng = np.random.default_rng()
+    
+    point = np.empty(shape=2)
+    
+    if point_a[0] == point_b[0]:
+        min_y = min(point_a[1], point_b[1])
+        max_y = max(point_a[1], point_b[1])
+        point[0] = point_a[0]
+        point[1] = rng.random() * (max_y - min_y) + min_y
+        
+    else:
+        min_x = min(point_a[0], point_b[0])
+        max_x = max(point_a[0], point_b[0])
+        
+        a = (point_b[1] - point_a[1]) / (point_b[0] - point_a[0])
+        b = (point_a[1] - a * point_a[0])
+        
+        param_t = rng.random() * (max_x - min_x) + min_x
+        point[0] = param_t
+        point[1] = a * param_t + b
+         
+    return point
+        
+
+def rand_rect_points(n: int, vertices):
+    rng = np.random.default_rng()
+    A, B, C, D = vertices[0], vertices[1], vertices[2], vertices[3]
+    len_AB = dist(A, B)
+    len_BC = dist(B, C)
+    
+    points = np.empty(shape=(n,2))
+    
+    for i in range(n):
+        side = rng.random(1) * 2 * (len_AB + len_BC)
+    
+        if side < len_BC:
+            points[i] = rand_seg_point(A, D)
+        elif side < 2 * len_BC:
+            points[i] = rand_seg_point(B, C)
+        elif side < 2 * len_BC + len_AB:
+            points[i] = rand_seg_point(A, B)
+        else:
+            points[i] = rand_seg_point(C, D)
+    
+    return points
+    
+def rand_in_range(  low: float = 0, 
+                    high: float = 0, 
+                    data_type: str = 'float64') -> np.array:
+    rng = random.default_rng()
+
+    return np.array((rng.random(1) * (high - low) + low), dtype=data_type)
+
+
+def rand_arr(n: int, 
+            low: float, 
+            high: float, 
+            data_type: str = 'float64') -> np.array:
+
+    rg = np.random.default_rng()
+
+    return np.array( (rg.random(n) * (high - low) + low), dtype=data_type)
+
+def rand_point2_set(n: int, 
+                    low: float = 0, 
+                    high: float = 1, 
+                    data_type: str = 'float64') -> np.array:
+    return np.array(np.random.random((n, 2)) * (high - low) + low, dtype=data_type)
+
+def rand_circle_points( n: int = 10,
+                        x: float = 0, 
+                        y: float = 0, 
+                        r: float = 1, 
+                        data_type: str = 'float64') -> np.array:
+    rng = np.random.default_rng()
+
+    circle = np.empty(n * 2, dtype=data_type).reshape(n, 2)
+
+    for i in range(n):
+        rn = rng.random() * 2 * np.pi
+        circle[i][0] = r * np.cos(rn) + x
+        circle[i][1] = r * np.sin(rn) + y
+
+    return circle
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{sorting}}
+\begin{lstlisting}[language=Python]
+import os
+from sys import path
+path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
+
+from random import randint
+from typing import Callable, List
+from lib.stack import Stack
+
+
+def partition_cmp(arr: List, p: int, q: int, cmp: Callable = lambda x, y: x <= y) -> int: 
+    i = p - 1
+    
+    pivot_idx = randint(p, q)
+    pivot = arr[pivot_idx]
+    
+    # zamieniamy miejscami pivot z ostatnim elementem
+    arr[pivot_idx], arr[q] = arr[q], arr[pivot_idx]
+
+    for j in range(p, q):
+        if cmp(arr[j], pivot):
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+            
+    arr[i + 1], arr[q] = arr[q], arr[i + 1]
+    
+    return i + 1
+            
+            
+def qsort_iterative(arr: List, cmp: Callable = lambda x, y: x <= y):
+    stack = Stack(len(arr))
+    
+    stack.push(0)
+    stack.push(len(arr) - 1)
+    
+    while not stack.is_empty():
+        q = stack.top()
+        stack.pop()
+
+        p = stack.top()
+        stack.pop()
+        
+        pivot_idx = partition_cmp(arr, p, q, cmp=cmp)
+        
+        if pivot_idx - 1 > p:
+            stack.push(p)
+            stack.push(pivot_idx - 1)
+            
+        if pivot_idx + 1 < q:
+            stack.push(pivot_idx + 1)
+            stack.push(q))
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{stack}}
+\begin{lstlisting}[language=Python]
+class Stack:
+    def __init__(self, size = 0):
+        self.s = [] if size == 0 else [None] * size
+        self.size = size
+        self.itop = -1
+    
+    def push(self, item):
+        if self.itop < self.size - 1:
+            self.itop += 1
+            self.s[self.itop] = item
+        else:
+            self.itop += 1
+            self.size += 1
+            self.s.append(item)
+            
+    def pop(self):
+        if self.itop >= 0:
+            self.itop -= 1
+
+    def top(self):
+        if self.itop >= 0:
+            return self.s[self.itop]
+        else:
+            return None
+    
+    def sec(self):
+        if self.itop > 0:
+            return self.s[self.itop - 1]
+        else:
+            return None
+        
+    def is_empty(self):
+        return not (self.itop >= 0)
+
+    def getsize(self):
+        return self.itop+1
+    
+    def __str__(self):
+        return str(self.s[:self.itop+1])  
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{util}}
+\begin{lstlisting}[language=Python]
+import json
+from typing import Literal, Union
+from lib.mytypes import *
+from random import randint
+import matplotlib.colors as mcolors
+import math
+import numpy as np
+import csv
+
+def det3x3( ux, uy, uz,
+            vx, vy, vz,
+            wx, wy, wz) -> float:
+    return (ux * vy * wz) + (uy * vz * wx) + (uz * vx * wy) - (wx * vy * uz) - (wy * vz * ux) - (wz * vx * uy)
+
+
+def orientation(p1: Point, p2: Point, p3: Point, eps: float = 1e-5) -> Literal[-1, 0, 1]:
+    det = det3x3(p1[0], p1[1], 1,
+                 p2[0], p2[1], 1,
+                 p3[0], p3[1], 1)
+    if det < -eps:
+        return -1
+    elif det < eps:
+        return 0
+    else:
+        return 1
+
+    
+def save_points_to_json(path: str, points: ListOfPoints, indent: int = None) -> None:
+    with open(path, 'w') as file:
+        file.write(json.dumps(points, indent = indent)) 
+    
+
+def load_points_from_json(path: str) -> None:
+    with open(path, 'r') as file:
+        return json.load(file)
+
+        
+def save_data_csv(path: str, data):
+    with open(path, 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        for row in data:
+            writer.writerow(row)
+        
+        
+def index_of_min(points: ListOfPoints, cmp_idx = 0) -> Union[int, None]:
+    if len(points) < 1 or cmp_idx < 0 or cmp_idx > 1: return None
+
+    min_el = points[0]
+    min_idx = 0
+
+    for i in range(1, len(points)):
+        if  points[i][cmp_idx] < min_el[cmp_idx] \
+            or \
+            points[i][cmp_idx] == min_el[cmp_idx] and points[i][1 - cmp_idx] < min_el[1 - cmp_idx]:
+                
+            min_el = points[i]
+            min_idx = i
+        
+    return min_idx
+
+
+def index_of_max(points: ListOfPoints, cmp_idx = 0) -> Union[int, None]:
+    if len(points) < 1 or cmp_idx < 0 or cmp_idx > 1: return None
+    
+    max_el = points[0]  
+    max_idx = 0
+    
+    for i in range(1, len(points)):
+        if  points[i][cmp_idx] > max_el[cmp_idx] \
+            or \
+            points[i][cmp_idx] == max_el[cmp_idx] and points[i][1 - cmp_idx] > max_el[1 - cmp_idx]:
+                
+            max_el = points[i]
+            max_idx = i
+            
+    return max_idx
+
+
+def dist_sq(p1, p2):
+    return (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
+
+def swap_points(p, q):
+    p[0], p[1], q[0], q[1] = q[0], q[1], p[0], p[1]
+
+    
+    
+def divide(points,m): #dzieli zbior punktow na w miarae rowne podzbiory o rozmiarze m lub m-1
+    n=len(points)
+    for i in range(1,n):#gwarantuje, ze w pierwszym zbiorze Qi pierwszy element jest najnizszy, czyli nalezy do otoczki ostatecznej
+        if points[i][1] < points[0][1]:
+            buf=points[i]
+            points[i] = points[0]
+            points[0]=buf
+            
+    k=math.ceil(n/m)
+    Q=[[] for i in range(k)]
+    i=0
+    while i<n:
+        for j in range(k):
+            if i==n:
+                break
+            Q[j].append(points[i])
+            i+=1
+    if len(Q[0]) > m:
+        return None
+            
+    return Q
+
+def makeSheaf(Points): #laczy punkty w kolejnosci jakiej sa podane
+    Sheaf=[]
+    for i in range(len(Points)-1):
+        Sheaf.append([Points[i],Points[i+1]])
+    return Sheaf
+
+def makeFullSheaf(Points): #laczy punkty w kolejnosci jakiej sa podane, dodatkowo domyka cylk
+    Sheaf=[]
+    for i in range(len(Points)-1):
+        Sheaf.append([Points[i],Points[i+1]])
+    Sheaf.append([Points[len(Points)-1],Points[0]])
+    return Sheaf
+
+def length(v):
+     return np.sqrt((v[1][0]-v[0][0])**2+(v[1][1]-v[0][1])**2)
+
+def det(a,b,c):
+    return a[0]*b[1]-a[0]*c[1]-b[0]*a[1]+b[0]*c[1]+c[0]*a[1]-c[0]*b[1]
+
+
+def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
+    ln = len(Q)
+
+    def tangetUtil(p, Q, l, r):
+        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            return None
+
+        mid = (l + r) // 2
+        if det(Q[0], Q[1], p) >= accur and det(Q[ln - 1], Q[0], p) >= accur:
+            if (det(Q[0], p, Q[mid]) <= -accur) or (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and \
+                                                    det(p, Q[mid], Q[(mid - 1) % ln]) <= -accur) or \
+                    (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur):
+                return tangetUtil(p, Q, mid + 1, r)
+
+        else:
+            if det(Q[0], p, Q[mid]) > -accur and \
+                    ((det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur) or \
+                     (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[
+                         (mid - 1) % ln]) <= -accur)):  # chyba nie potrzebne sprawdz na koncu
+                return tangetUtil(p, Q, mid + 1, r)
+
+        if (det(p, Q[mid], Q[(mid + 1) % ln]) > -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur) \
+                or (
+                -accur < det(p, Q[mid], Q[(mid + 1) % ln]) < accur and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
+                (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
+
+            while -accur < det(p, Q[mid], Q[(mid + 1) % ln]) < accur and length([Q[(mid + 1) % ln], p]) > length(
+                    [Q[mid], p]):
+                mid = (mid + 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
+            return mid
+
+        else:
+            return tangetUtil(p, Q, l, mid - 1)
+
+    return tangetUtil(p, Q, 0, ln - 1)
+
+def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
+    ln = len(Q)
+
+    def tangetUtil(p, Q, l, r):
+        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            return None
+
+        mid = (l + r) // 2
+        if det(Q[0], Q[1], p) >= accur and det(Q[ln - 1], Q[0], p) >= accur:
+            if (det(Q[0], p, Q[mid]) >= accur) or (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and \
+                                                    det(p, Q[mid], Q[(mid - 1) % ln]) >= accur) or \
+                    (det(p, Q[mid], Q[(mid + 1) % ln]) <= -accur and det(p, Q[mid], Q[(mid - 1) % ln]) > -accur):
+                return tangetUtil(p, Q, l, mid-1)
+
+        else:
+            if  det(Q[ln - 1], Q[0], p) >= accur and det(Q[0], Q[1], p) <= - accur:
+                return 0
+            if det(Q[0], p, Q[mid]) < accur and \
+                    ((det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) or \
+                     (det(p, Q[mid], Q[(mid + 1) % ln]) >= accur and det(p, Q[mid], Q[
+                         (mid - 1) % ln]) >= accur)):  # chyba nie potrzebne sprawdz na koncu
+                if ln > 2:
+                    return tangetUtil(p, Q, l, mid-1)
+
+        if (det(p, Q[mid], Q[(mid + 1) % ln]) < accur and det(p, Q[mid], Q[(mid - 1) % ln]) < accur) \
+                or (
+                -accur < det(p, Q[mid], Q[(mid + 1) % ln]) < accur and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
+                (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
+
+            while -accur < det(p, Q[mid], Q[(mid - 1) % ln]) < accur and length([Q[(mid - 1) % ln], p]) > length(
+                    [Q[mid], p]):
+                mid = (mid - 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
+            return mid
+
+        else:
+            return tangetUtil(p, Q, mid + 1, r)
+
+    return tangetUtil(p, Q, 0, ln - 1)
+
+
+def compr(p,q,current,accur=10**(-6)):
+        if det(current,p,q)>accur:
+            return -1
+        elif det(current,p,q)<accur:
+            return 1
+        else:
+            return 0
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{timemeasure}}
+\begin{lstlisting}[language=Python]
+import os
+from sys import path
+path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
+
+from timeit import default_timer as timer
+from typing import Any, Callable, List
+from pprint import pprint
+import numpy as np
+
+def get_exec_time(func: Callable, *args, points = []) -> float:
+    tstart = timer()
+    func(points, *args)
+    tstop = timer()
+    return (tstop - tstart)
+
+    
+def avg_exec_time(func: Callable, *args, points = [], times = 1) -> float:
+    total_exec_time = 0
+    
+    for _ in range(times):
+        points_copy = points.copy()
+        total_exec_time += get_exec_time(func, *args, points = points_copy)
+        
+    return total_exec_time / times
+\end{lstlisting}
+
+\subsubsection*{Kod modułu \emph{tangent}}
+\begin{lstlisting}[language=Python]
+def tangent(p, Q, accur=0):  # Q-zbior punktow w formie otoczki
+    ln = len(Q)
+
+    def tangetUtil(p, Q, l, r):
+        if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
+            return None
+
+        mid = (l + r) // 2
+        if det(Q[0], Q[1], p) > 0 and det(Q[ln - 1], Q[0], p) > 0:
+            if (det(Q[0], p, Q[mid]) < 0) or (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and \
+                                              det(p, Q[mid], Q[(mid - 1) % ln]) < 0) or \
+                    (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0):
+                return tangetUtil(p, Q, mid + 1, r)
+
+        else:
+            if det(Q[0], p, Q[mid]) >= 0 and \
+                    ((det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0) or \
+                     (det(p, Q[mid], Q[(mid + 1) % ln]) < 0 and det(p, Q[mid], Q[
+                         (mid - 1) % ln]) < 0)):  # chyba nie potrzebne sprawdz na koncu
+                return tangetUtil(p, Q, mid + 1, r)
+
+        if det(p, Q[mid], Q[(mid + 1) % ln]) >= 0 and det(p, Q[mid], Q[(mid - 1) % ln]) >= 0 \
+                or (det(p, Q[mid], Q[(mid + 1) % ln]) == 0 and (Q[mid][0] <= p[0] <= Q[(mid + 1) % ln][0]) and \
+                    (Q[mid][1] <= p[1] <= Q[(mid + 1) % ln][1])):
+
+            while (det(p, Q[mid], Q[(mid + 1) % ln]) == 0):
+                mid = (mid + 1) % ln  # jesli jest styczna wspolliniowa, to bierzmy pod uwage punkt blizszy
+            return mid
+
+        else:
+            return tangetUtil(p, Q, l, mid - 1)
+
+    return tangetUtil(p, Q, 0, ln - 1)
+\end{lstlisting}
 
 \subsubsection{Moduł \emph{pure}}
 
@@ -118,6 +607,8 @@ Moduł zawiera w sobie następujące podmoduły:
     \item   \emph{jarvis.py} -- implementacja algorytmu Jarvisa
     \item   \emph{lowerupper.py} -- implementacja algorytmu "górna-dolna"
 \end{enumerate}
+
+Kody algorytmów znajdują się w sekcji \emph{Algorytmy}.
 
 \subsubsection{Moduł \emph{vis}}
 
@@ -139,9 +630,6 @@ Moduł zawiera w sobie następujące podmoduły:
             \begin{itemize}
                 \item   \emph{matplotlib}
                 \item   \emph{numpy}
-                \item   \emph{json}
-                \item   \emph{csv}
-                \item   \emph{pprint}
             \end{itemize}
     \item   Jupyter Notebook
 \end{enumerate}
@@ -150,7 +638,7 @@ Moduł zawiera w sobie następujące podmoduły:
 
 \subsubsection{Uruchomienie programu}
 
-W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{program.ipynb}, oraz wykonywać kolejne komórki notatnika.
+W celu uruchomienia wizualizacji algorytmów należy uruchomić notebook (poprzez Jupyter Notebook) \emph{kafara\_czarniecki\_program.ipynb}, oraz wykonywać kolejne komórki notatnika.
 
 W celu uruchomienia pomiarow wydajności algorytmów należy przejść do sekcji \emph{Pomiary czasu} wykonać pierwszą komórkę (z importami algorytmów) a następnie przeprowadzać testy i wyświetlać rezultaty w 
 interesujących nas przypadkach. 
@@ -454,9 +942,18 @@ return upper_ch
 
     \subsubsection{Szczegóły}
         \subsubsection*{Wyznaczanie stycznych}
+        Niech $Q$ będzie punktem przez który ma przechodzić styczna. 
 
-        
-        
+        \begin{enumerate}
+            \item   W czasie liniowym znajdujemy punkt otoczki $P_i$ o największej odciętej (jeżeli jest wiele, to wybieramy ten o najmniejszej rzędnej)
+            \item   Dopóki $P_{i+1}$ nie znajduje się po lewej stronie odcinka $QP_i$:
+                    \begin{enumerate}
+                        \item   Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe oraz $P_i$ leży dalej (lub w takiej samej odległości) $Q$ niż $P_{i+1}$ to przerwij działanie pętli.
+                        \item   $P_i := P_{i+1}$ 
+                    \end{enumerate}
+            \item   W całkowicie analogiczny sposób wyznaczamy dolną styczną. 
+        \end{enumerate}
+       
     \subsubsection{Złożoność}
         Posortowanie punktów zajmuje $O(n \, lgn)$. Wydaje główna pętla programu wykonuje się w czasie $O(n)$, ponieważ możemy usunąć maksymalnie $k-3$ punkty (gdy $k$ jest liczebnością 
         zbioru punktów otoczki znaną w danej iteracji), ale zauważmy, że każdy z punktów usuwany jest co najwyżej raz. Wyszukanie stycznych w głównej pętli także zajmuje 
@@ -746,106 +1243,140 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
                             Wtedy otoczka jest pełna i kończymy algorytm.
                 \end{itemize}
     
-        \item   Zwracamy punkty otoczki. 
+        \item   Zwracamy punkty otoczki. \\
     \end{enumerate}
-    Jednakże nadżędną istotą powyższego algorytmu jest to, że wykona się on w drugiej
-    części w co najwyżej m krokach(dany rozmiar podzbioru). Inaczej mówiąc m musi być
-    większe bądź równe(w idealnym przypadku) liczbie punktów należących do otoczki k.
-    Jeśli wykonamy m kroków i wciąż nie mamy otoczki, to przerywamy algorytm. I 
-    próbujemy z większym m. Aby nie popsóć złożoności dużą ilością powtórzeń głównej
-    części algorytmu najlepiej za każdym razem parametr m podnosić do kwadratu. W przypadku
-    gdy m>=n po prustu za m przyjmujemy n. Wtedy algorytm chana sprowadza się do algorytmu 
+
+    Jednakże nadrzędną istotą powyższego algorytmu jest to, że wykona się on w drugiej
+    części w co najwyżej $m$ krokach(dany rozmiar podzbioru). Inaczej mówiąc $m$ musi być
+    większe bądź równe (w idealnym przypadku) liczbie punktów należących do otoczki $k$.
+    Jeśli wykonamy $m$ kroków i wciąż nie mamy otoczki, to przerywamy algorytm. I 
+    próbujemy z większym $m$. Aby nie popsuć złożoności dużą ilością powtórzeń głównej
+    części algorytmu najlepiej za każdym razem parametr $m$ podnosić do kwadratu. W przypadku
+    gdy $m \ge n$ za $m$ przyjmujemy $n$. Wtedy algorytm Chana sprowadza się do algorytmu 
     Grahama.
     \subsubsection{Szczegóły}  
-    % \begin{itemize}
-    %     \item   Najniższy punkt zbioru wyznaczamy w czasie liniowym. W trakcie podziału zpewniamy, że znajdzie się on w otoczce $C_0$ w indeksie $0$.
-    %     \item   Wszystkie punkty leżacej na jednej prostej, poza najbardziej oddalonym od $Q$ usuwamy w czasie liniowym w następujący sposób:
-    %             Iterując przez posortowaną tablicę, zaczynająć od indeksu $i := 1$, zapamiętujemy ostatni indeks na który wstawialiśmy $j$ (na początku $j := 1$).
-    %             Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe to $i := i+1$. Jeżeli nie są współliniowe to $P_i$ wpisujemy na pozycję $j$, a następnie $j := j + 1$. Następnie, 
-    %             w dalszej części algorytmu posługujemy się częścią tablicy $[0, \ldots, j - 1]$.
-    % \end{itemize}     
+    \begin{itemize}
+        \item   Najniższy punkt zbioru wyznaczamy w czasie liniowym. W trakcie podziału zpewniamy, że znajdzie się on w otoczce $C_0$ w indeksie $0$.
+        \item   Podział zapewia, że w każdym podzbiorze będzie m, lub m-1 punktów.
+        \item   Znajdowanie stycznej wykonujemy w czasie O(log n). Wykorzystujemy do tego binary search, można tak zrobić, ponieważ otoczka
+                zadana jest przeciwnie do ruchu wskazówek zegara. Najpierw obieramy wskaźniki $l$ i $r$. Następnie obliczamy $mid$ =($l$+$r$)/2. Gdy obaj sąsiedzi
+                mida są po lewej stronie - mid jest szukanym indeksem. Gdy mid znajduje się po po prawej stronie odcinka $pq$, gdzie $p$, to pierwszy wierzchołek otoczki(pierwszy$l$),
+                a $q$, to punkt do którego stycznej szukamy. Wtedy prawa styczna znajduje się w przedziale mid+1,r i urachamiamy tą samą funkcję dla tych indeksów.
+                Gdy $mid$ jest współliniowy, bądź po lewej stronie z $pq$, to jeśli jego następnik(mid+1) jest po prawej stronie odcinka $|q mid|$, to również styczna się znajduje w przedziale
+                mid+1 ,r. W pozostałych przypadkach znajduje się w przedziale l, mid-1. 
+     \end{itemize}     
     \subsubsection{Złożoność}
     Złożoność głównej części algorytmu.
     \begin{itemize}
-        \item Złożoność pierwsszej części składa się na :
+        \item Na złożoność pierwszej części algorytmu składa się:
                 \begin{itemize}
                     \item   Podział zbioru punktów na podzbiory $O(n)$;
                     \item   Wyznaczenie otoczek dla podzbiorów. Mamy $\lceil \frac{n}{m} \rceil$ podzbiorów
                             rozmiaru m, dla każdego z nich wyznaczamy otoczkę algorytmem Grahama.
-                            Algorytm Grahama działa $O(nlog(n))$. Więc łącznie mamy O(ceil(n/m)*mlog(m))=
-                            $O(nlog(m))$.
+                            Algorytm Grahama działa $O(nlog(n))$. Więc łącznie mamy $ O(\lceil \frac{n}{m} \rceil \cdot mlog(m)) = O(nlog(m))$.
                 \end{itemize}
-                Łącznie dla pierewszej części mamy O(nlog(m)), gdzie m jest wybranym maksymalnym
+                Łącznie dla pierewszej części mamy $O(nlog(m))$, gdzie $m$ jest wybranym maksymalnym
                  rozmiarem podzbiorów.
 
-        \item Złożoność drugiej części składa się na :
+        \item Na złożoność drugiej części algorytmu składa się:
                  \begin{itemize}
                      \item   Wyznaczenie następnego punktu dla każdego punktu z otoczki głównej o rozmiarze $k$
-                     \item   Wyznacznie następnego punktu składa się na wyznaczenie dla każdej z m podotoczek
+                     \item   Wyznacznie następnego punktu składa się na wyznaczenie dla każdej z $m$ podotoczek
                             stycznej do tej podotoczki. Styczną wyznaczamy binary searchem w czasie $O(log(m))$
                             (otoczka $C_i$ ma co najwyżej $m$ wierzchołków). Otoczek jest $\left\lceil(n/m) \right\rceil$, a zatem czas
                             wyznaczenia kolejngo wierzchołka otoczki to $O(\lceil(n/m)\rceil log(m)$).    
                  \end{itemize}
                  Zakładając, że liczba wierzchołków otoczki $k \le m$(gdy $k > m$ przerywamy algorytm, więc złożoność pozostaje ta sama),
-                  to ostatecznie mamy złożoność dla drugiej części rzędu : $O(k \left\lceil(n/m)\right\rceil log(m)) = O(nlog(m)) $w idealnym przypadku $O(nlog(k))$
+                  to ostatecznie mamy złożoność dla drugiej części rzędu : $O(k \left\lceil(n/m)\right\rceil log(m)) = O(nlog(m)) $ w idealnym przypadku $O(nlog(k))$
     \end{itemize}
 
-    Cała złożoność głównej części algorytmu, to $O(nlog(m))$ , gdzie $m$ jest wybraną wiellkości podzbioru.
+    Cała złożoność głównej części algorytmu, to $O(nlog(m))$, gdzie $m$ jest wybraną liczebnością podzbioru.
     Złożonośc algorytmu dla próbowania algorytmu z kolejnymi $m$ postaci $2^{2^m}$ dla $m \ge 1$, to:
-    w takim razie złożoność można opisać wzorem $ \sum_{t=1}^{\lceil log log k \rceil} O(n log (2^{2^t}))=
-    O(n*2^{1+{\lceil log log k \rceil}})=O(nlog k) $
+    w takim razie złożoność można opisać wzorem $ \sum_{t=1}^{\lceil log log k \rceil} O(n log (2^{2^t})) =
+    O(n*2^{1+{\lceil log log k \rceil}})= O(nlog k) $
 
     \subsubsection{Kod}
 \begin{lstlisting}[language=Python]
-from divide import *
-from det import *
-from tangentBothsides import *
-
-def compr(p, q, current,
-          accur=10 ** (-6)):  # jezeli p jest po prawej  odcinka [current,q] - jest 'wiekszy', to zwracamy 1
-    if det(current, p, q) > accur:
-        return -1
-    elif det(current, p, q) < accur:
-        return 1
-    else:
-        return 0
-
-def nextvert(C, curr):  # dla danego punktu wspolzednymi z Q[i][j] jesli jest to punkt nalezacy do finalnej otoczki, to
-    # zwraca nastepny punkt nalezacy do finalnej otoczki zadanego w takich samych wspolzednych Q[nxt[0]][nxt[1]]
-    i, j = curr
-    nxt = (i, (j + 1) % len(C[i]))
-    for k in range(len(C)):
-        t = tangent(C[i][j], C[k])
-        if t != None and k != i and compr(C[nxt[0]][nxt[1]], C[k][t], C[i][j]) > 0 and (k, t) != (curr):
-            nxt = (k, t)
-
-    return nxt
-
-def chanUtil(points, m):
-    Q = divide(points, m)
-    C = []
-    for i in range(len(Q)):
-        C.append(Graham(Q[i]))
-
-    curr = (0, 0)
-    ans = []
-    i = 0
-    while i < m:
-        ans.append(C[curr[0]][curr[1]])
-        if nextvert(C, curr) == (0, 0):
-            return ans
-        curr = nextvert(C, curr)
-        i += 1
-
-    return None
-
-def chan(points):
+def divide(points, m):
     n = len(points)
-    m = 4
-    hoax = None
-    while hoax == None:
-        hoax = chanUtil(points, m)
-        m = min(n, m * m)
+    for i in range(1,
+                   n):  # gwarantuje, ze w pierwszym zbiorze Qi pierwszy element jest najnizszy, czyli nalezy do otoczki ostatecznej
+        if points[i][1] < points[0][1]:
+            buf = points[i]
+            points[i] = points[0]
+            points[0] = buf
+
+    k = math.ceil(n / m)
+    Q = [[] for i in range(k)]
+    i = 0
+    while i < n:
+        for j in range(k):
+            if i == n:
+                break
+            Q[j].append(points[i])
+            i += 1
+    if len(Q[0]) > m:
+        return None
+
+    return Q
+    
+    
+    
+    def nextvert(C, curr,accur=10**(-7)):  # dla danego punktu wspolzednymi z Q[i][j] jesli jest to punkt nalezacy do finalnej otoczki, to
+        # zwraca nastepny punkt nalezacy do finalnej otoczki zadanego w takich samych wspolzednych Q[nxt[0]][nxt[1]]
+        i, j = curr
+        nxt = (i, (j + 1) % len(C[i]))
+        for k in range(len(C)):
+            if k == i:
+                continue
+    
+            t = tangent_r(C[i][j], C[k])
+            if t == None:
+                print("zle")
+                continue
+    
+            if  det(C[i][j],C[nxt[0]][nxt[1]],C[k][t])<accur and (k,t)!=(curr):
+                if det(C[i][j],C[nxt[0]][nxt[1]],C[k][t])>-accur:
+                    if length([C[k][t],C[i][j]]) <= length([C[nxt[0]][nxt[1]],C[i][j]]):
+                        continue
+                nxt=(k,t)
+    
+        return nxt
+    
+    
+    def chanUtil(points, m):
+        Q = divide(points, m)
+        C = []
+        for i in range(len(Q)):
+            C.append(graham(Q[i]))
+    
+        curr = (0, 0)
+        ans = []
+        i = 0
+    
+        while i < m:
+            ans.append(C[curr[0]][curr[1]])
+    
+            nxt = nextvert(C, curr)
+            if nxt == (0, 0):
+                return ans
+            curr = nxt
+            i += 1
+    
+        return None
+    
+    
+    def chan(points, visual=False):
+        plot = None
+        n = len(points)
+        m = 4
+        hoax = None
+    
+    
+        return hoax
+    
+    
+    
 
     return hoax
 \end{lstlisting}
@@ -954,16 +1485,12 @@ def chan(points):
 Testy prowadzone były na następujących zbiorach:
 
 \begin{itemize}
-    \item   Testy odbywały się na 4-rech typach zbiorów:
-        \begin{itemize}
-            \item   typ A - losowo rozłożone punkty płaszczyzny o określonych zakresach współrzędnych
-            \item   typ B - losowo rozłożone punkty leżące na okręgu o zadanych parametrach
-            \item   typ C - losowo rozłożone punkty leżące na bokach prostokąta o zadanych parametrach
-            \item   typ D - losowo rozłożone punkty leżące na 2 bokach kwadratu, umiejscowionego tak,
-                    że te dwa boki pokrywają sie z osiami układu oraz na jego przekątnych \\
-        \end{itemize}
+    \item   typ A - losowo rozłożone punkty płaszczyzny o określonych zakresach współrzędnych
+    \item   typ B - losowo rozłożone punkty leżące na okręgu o zadanych parametrach
+    \item   typ C - losowo rozłożone punkty leżące na bokach prostokąta o zadanych parametrach
+    \item   typ D - losowo rozłożone punkty leżące na 2. przekątnych oraz 2. bokach kwadratu, umiejscowionego tak,
+            że dwa boki pokrywają sie z osiami układu \\
 \end{itemize}
-
 
 Charakterystyki zbiorów zostały dobrane w taki sposób aby odzwierciedlać możliwie różne zachowanie się  poszczególnych algorytmów w zależności od ilości przypadków zdegenerowanych (liczebność 
 współliniowych otoczek), ilości potrzebnych do wykonania porównań i operacji. Bardziej szczegółowe omówienie charakterystyki algorytmów dla poszczególnych zbiorów znajduje się w kolejnych sekcjach. 
@@ -974,6 +1501,11 @@ współliniowych otoczek), ilości potrzebnych do wykonania porównań i operacj
 
 W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-graham}, 
 \ref{fig:okrag-graham}, \ref{fig:prost-graham}, \ref{fig:kw-graham} widzimy ilustrację danych z tabeli \ref{tab:graham}.
+
+\subsection {Porównanie z przewidywaniami teoretycznymi} Kształt dla każdego z typu zbiorów dla algorytmu Grahama przypomina wykres liniowy. Zgdza się to z przewidywaniami teoretycznymi
+dla tegoż algorytmu - ma on złożoność O(n logn). Wykres o takiej złożoności taka bardzo przypomina wykres liniowy.
+Spośród algorytmów o tej złożoności Graham zdaje się być najwolniejszy. Ilość wierzchołków w otoczce nie ma znaczenia
+dla każdego rozkładu graham wykazuje się podobnym czasem.
 
 
 
@@ -992,6 +1524,10 @@ W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dl
 \multicolumn{1}{|c|}{D} & 0.4256 & 0.6523 & 0.924 & 1.2255 & 1.4233 & 1.8752 & 1.9285 & 2.3207 & 2.5692 & 2.88 \\ \hline
 \end{tabular}
 \end{table}
+
+
+
+
 
 \begin{figure}[]
     \centering
@@ -1030,6 +1566,13 @@ W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dl
 
 W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna-dolna dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-lowerupper}, 
 \ref{fig:okrag-lowerupper}, \ref{fig:prost-lowerupper}, \ref{fig:kw-lowerupper} widzimy ilustrację danych z tabeli \ref{tab:lowerupper}.
+
+\subsection{Porównanie z przewidywaniami teoretycznymi} Kształt dla każdego z typu zbiorów dla algorytmu górna-dolna przypomina wykres liniowy.Jest bardzo szybki(szybsze są tylko quickhull i chan)
+na tle Grahama wykres złożoności tego algorytm przypomina raczej stałą. Jednak, gdy wyizolować sam wykres algorytmu góra dół, to widzimy, że także i on przypomina wykres liniowy
+Zgdza się to z przewidywaniami teoretycznymi dla tegoż algorytmu - ma on złożoność O(n logn). 
+Wykres o takiej złożoności taka bardzo przypomina wykres liniowy. 
+Ilość wierzchołków w otoczce nie ma znaczenia czas wykonania algorytmu góra-dół zależy tylko od mocy zbioru punktów, dla którego otoczki szukamy.
+
 
 \begin{table}[]
 \centering
@@ -1086,6 +1629,14 @@ W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna
 W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-chan}, 
 \ref{fig:okrag-chan}, \ref{fig:prost-chan}, \ref{fig:kw-chan} widzimy ilustrację danych z tabeli \ref{tab:chan}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+    Chan spośród wszystkich rozważanych algorytmów wypadł najgorzej względem reszty. Teorytyczna złożoność chana wynosi O(nlogk), gdzie k jest ilością wierzchołków w otoczce. Patrząc na wykresy czasu dla Chana
+    ilość wierzchołków w otoczce faktycznie wpływa na szybkość jego działania dla chmury punktów działał bardzo nieregularnie, natomiast
+    dla pozostałych rozkładów, o w stałej ilości wierzchołków w otoczce względem wierzchołków zbioru w algorytmie chana dominała natura liniowa.
+    Wygląda na to, że przewidywania teoretyczne po części sprawdzająsię dla chana, jego wykres ma kształt w przybliżeniu liniowy, a dla okręgu, gdzie jest najwięcej
+    wierzchołków w otoczce jest najbardziej stromy. Jednakże poza tym, że ma najlepszą złożoność asymptotyczną, to niestety ta implementacja ma największy współczynnik stały w porównaniu z innymi algorytmami 
+    i dlatego wypada najgorzej. Jedyny wynik porównywalny z innymi uzyskał w zbiorze typu D, gdzie ma najlepsze warunki - są tylko 4 wierzchołki w otoczce.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu Chana w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1138,6 +1689,12 @@ W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla ko
 
 W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHull dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-quickhull}, 
 \ref{fig:okrag-quickhull}, \ref{fig:prost-quickhull}, \ref{fig:kw-quickhull} widzimy ilustrację danych z tabeli \ref{tab:quickhull}.
+
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm QuickHull z wszystkich wypadła najlepiej. Na tle innych wykresów wygląda jakby miał asymptotyczność stałą. 
+Po zobaczeniu jednak jego wykresu osobno widać, że jest to wykres w przybliżeniu liniowy(z wyglądu), co się zgadza z przewidywaniami teoretycznymi.
+Ma on jednak najmniejszy stały współczynnik względem pozostałych algorytmów, co odpowiada jego zdecydowanie większej prostoty względem innych.
+///
 
 \begin{table}[]
 \centering
@@ -1196,6 +1753,11 @@ W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHu
 W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-dziel}, 
 \ref{fig:okrag-dziel}, \ref{fig:prost-dziel}, \ref{fig:kw-dziel} widzimy ilustrację danych z tabeli \ref{tab:dziel}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm dziel i zwyciężaj wypadł na drugim miejscu zaraz po grahamie. Jego wykres odpowiada przewidywaniom teoretycznym,
+jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
+ten działa w zależności od ich rozmiarów.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu dziel i zwyciężaj w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1252,6 +1814,11 @@ W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwy
 W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrostowy i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-przyrost}, 
 \ref{fig:okrag-przyrost}, \ref{fig:prost-przyrost}, \ref{fig:kw-przyrost} widzimy ilustrację danych z tabeli \ref{tab:przyrost}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm przyrostowy wypadł odrobinę lepiej od dziel i zwyciężaj. Jego wykres odpowiada przewidywaniom teoretycznym,
+jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
+ten działa w zależności od ich rozmiarów.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu przyrostowego w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1307,6 +1874,12 @@ W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrost
 W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-jarvis}, 
 \ref{fig:okrag-jarvis}, \ref{fig:prost-jarvis}, \ref{fig:kw-jarvis} widzimy ilustrację danych z tabeli \ref{tab:jarvis}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm Jarvisa zachowywał się zgodnie z przewidywaniami teoretycznymi. Jego złożoność wynosi O(kn), gdzie k to liczba wierzchołków w otoczce.
+Dla chmury punktów, gdszie liczba wierzchołków w otoczce jest losowa zachowywał się nieregularnie. Dla pozostałych zbiorów: dla rozkładu kołowego
+ukwadratowił się i miał zdecydowanie najgorsze wyniki. Dla zbioru o rozmiarze 5500 wykonywał sięniemal 3 min. Jednakże dla zbiorów, jego złożoność stanowiła
+przewagę mógł śmiało konkurować z pozostałymi algorytmami O(nlogn) i odznaczał siępodobnymi czasami.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu Jarvisa w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1322,6 +1895,9 @@ W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i 
 \multicolumn{1}{|c|}{D} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
 \end{tabular}
 \end{table}
+
+
+
 
 \begin{figure}[]
     \centering
@@ -1530,6 +2106,7 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
         \label{fig:kw-zbiorczy-2}
     \end{minipage}
 \end{figure}
+
 
 
 \section{Bibliografia}
