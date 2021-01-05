@@ -437,6 +437,7 @@ def makeFullSheaf(Points): #laczy punkty w kolejnosci jakiej sa podane, dodatkow
     for i in range(len(Points)-1):
         Sheaf.append([Points[i],Points[i+1]])
     Sheaf.append([Points[len(Points)-1],Points[0]])
+
     return Sheaf
 
 def length(v):
@@ -1255,13 +1256,16 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
     gdy $m \ge n$ za $m$ przyjmujemy $n$. Wtedy algorytm Chana sprowadza się do algorytmu 
     Grahama.
     \subsubsection{Szczegóły}  
-    % \begin{itemize}
-    %     \item   Najniższy punkt zbioru wyznaczamy w czasie liniowym. W trakcie podziału zpewniamy, że znajdzie się on w otoczce $C_0$ w indeksie $0$.
-    %     \item   Wszystkie punkty leżacej na jednej prostej, poza najbardziej oddalonym od $Q$ usuwamy w czasie liniowym w następujący sposób:
-    %             Iterując przez posortowaną tablicę, zaczynająć od indeksu $i := 1$, zapamiętujemy ostatni indeks na który wstawialiśmy $j$ (na początku $j := 1$).
-    %             Jeżeli $Q$, $P_i$, $P_{i+1}$ są współliniowe to $i := i+1$. Jeżeli nie są współliniowe to $P_i$ wpisujemy na pozycję $j$, a następnie $j := j + 1$. Następnie, 
-    %             w dalszej części algorytmu posługujemy się częścią tablicy $[0, \ldots, j - 1]$.
-    % \end{itemize}     
+    \begin{itemize}
+        \item   Najniższy punkt zbioru wyznaczamy w czasie liniowym. W trakcie podziału zpewniamy, że znajdzie się on w otoczce $C_0$ w indeksie $0$.
+        \item   Podział zapewia, że w każdym podzbiorze będzie m, lub m-1 punktów.
+        \item   Znajdowanie stycznej wykonujemy w czasie O(log n). Wykorzystujemy do tego binary search, można tak zrobić, ponieważ otoczka
+                zadana jest przeciwnie do ruchu wskazówek zegara. Najpierw obieramy wskaźniki $l$ i $r$. Następnie obliczamy $mid$ =($l$+$r$)/2. Gdy obaj sąsiedzi
+                mida są po lewej stronie - mid jest szukanym indeksem. Gdy mid znajduje się po po prawej stronie odcinka $pq$, gdzie $p$, to pierwszy wierzchołek otoczki(pierwszy$l$),
+                a $q$, to punkt do którego stycznej szukamy. Wtedy prawa styczna znajduje się w przedziale mid+1,r i urachamiamy tą samą funkcję dla tych indeksów.
+                Gdy $mid$ jest współliniowy, bądź po lewej stronie z $pq$, to jeśli jego następnik(mid+1) jest po prawej stronie odcinka $|q mid|$, to również styczna się znajduje w przedziale
+                mid+1 ,r. W pozostałych przypadkach znajduje się w przedziale l, mid-1. 
+     \end{itemize}     
     \subsubsection{Złożoność}
     Złożoność głównej części algorytmu.
     \begin{itemize}
@@ -1347,23 +1351,70 @@ def chanUtil(points, m):
     curr = (0, 0)
     ans = []
     i = 0
-    while i < m:
-        ans.append(C[curr[0]][curr[1]])
-        if nextvert(C, curr) == (0, 0):
-            return ans
-        curr = nextvert(C, curr)
-        i += 1
+    while i < n:
+        for j in range(k):
+            if i == n:
+                break
+            Q[j].append(points[i])
+            i += 1
+    if len(Q[0]) > m:
+        return None
 
-    return None
-
-def chan(points):
-    n = len(points)
-    m = 4
-    hoax = None
-    while hoax == None:
-        hoax = chanUtil(points, m)
-        m = min(n, m * m)
-
+    return Q
+    
+    def nextvert(C, curr,accur=10**(-7)):  # dla danego punktu wspolzednymi z Q[i][j] jesli jest to punkt nalezacy do finalnej otoczki, to
+        # zwraca nastepny punkt nalezacy do finalnej otoczki zadanego w takich samych wspolzednych Q[nxt[0]][nxt[1]]
+        i, j = curr
+        nxt = (i, (j + 1) % len(C[i]))
+        for k in range(len(C)):
+            if k == i:
+                continue
+    
+            t = tangent_r(C[i][j], C[k])
+            if t == None:
+                print("zle")
+                continue
+    
+            if  det(C[i][j],C[nxt[0]][nxt[1]],C[k][t])<accur and (k,t)!=(curr):
+                if det(C[i][j],C[nxt[0]][nxt[1]],C[k][t])>-accur:
+                    if length([C[k][t],C[i][j]]) <= length([C[nxt[0]][nxt[1]],C[i][j]]):
+                        continue
+                nxt=(k,t)
+    
+        return nxt
+    
+    
+    def chanUtil(points, m):
+        Q = divide(points, m)
+        C = []
+        for i in range(len(Q)):
+            C.append(graham(Q[i]))
+    
+        curr = (0, 0)
+        ans = []
+        i = 0
+    
+        while i < m:
+            ans.append(C[curr[0]][curr[1]])
+    
+            nxt = nextvert(C, curr)
+            if nxt == (0, 0):
+                return ans
+            curr = nxt
+            i += 1
+    
+        return None
+    
+    
+    def chan(points, visual=False):
+        plot = None
+        n = len(points)
+        m = 4
+        hoax = None
+    
+    
+        return hoax
+    
     return hoax
 \end{lstlisting}
     
@@ -1488,6 +1539,11 @@ współliniowych otoczek), ilości potrzebnych do wykonania porównań i operacj
 W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-graham}, 
 \ref{fig:okrag-graham}, \ref{fig:prost-graham}, \ref{fig:kw-graham} widzimy ilustrację danych z tabeli \ref{tab:graham}.
 
+\subsection {Porównanie z przewidywaniami teoretycznymi} Kształt dla każdego z typu zbiorów dla algorytmu Grahama przypomina wykres liniowy. Zgdza się to z przewidywaniami teoretycznymi
+dla tegoż algorytmu - ma on złożoność O(n logn). Wykres o takiej złożoności taka bardzo przypomina wykres liniowy.
+Spośród algorytmów o tej złożoności Graham zdaje się być najwolniejszy. Ilość wierzchołków w otoczce nie ma znaczenia
+dla każdego rozkładu graham wykazuje się podobnym czasem.
+
 
 
 \begin{table}[]
@@ -1548,6 +1604,14 @@ W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dl
 W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna-dolna dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-lowerupper}, 
 \ref{fig:okrag-lowerupper}, \ref{fig:prost-lowerupper}, \ref{fig:kw-lowerupper} widzimy ilustrację danych z tabeli \ref{tab:lowerupper}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi} 
+Kształt dla każdego z typu zbiorów dla algorytmu górna-dolna przypomina wykres liniowy.Jest bardzo szybki(szybsze są tylko quickhull i chan)
+na tle Grahama wykres złożoności tego algorytm przypomina raczej stałą. Jednak, gdy wyizolować sam wykres algorytmu góra dół, to widzimy, że także i on przypomina wykres liniowy
+Zgdza się to z przewidywaniami teoretycznymi dla tegoż algorytmu - ma on złożoność O(n logn). 
+Wykres o takiej złożoności taka bardzo przypomina wykres liniowy. 
+Ilość wierzchołków w otoczce nie ma znaczenia czas wykonania algorytmu góra-dół zależy tylko od mocy zbioru punktów, dla którego otoczki szukamy.
+
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu górna-dolna w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1603,6 +1667,14 @@ W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna
 W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-chan}, 
 \ref{fig:okrag-chan}, \ref{fig:prost-chan}, \ref{fig:kw-chan} widzimy ilustrację danych z tabeli \ref{tab:chan}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Chan spośród wszystkich rozważanych algorytmów wypadł najgorzej względem reszty. Teorytyczna złożoność chana wynosi O(nlogk), gdzie k jest ilością wierzchołków w otoczce. Patrząc na wykresy czasu dla Chana
+ilość wierzchołków w otoczce faktycznie wpływa na szybkość jego działania dla chmury punktów działał bardzo nieregularnie, natomiast
+dla pozostałych rozkładów, o w stałej ilości wierzchołków w otoczce względem wierzchołków zbioru w algorytmie chana dominała natura liniowa.
+Wygląda na to, że przewidywania teoretyczne po części sprawdzająsię dla chana, jego wykres ma kształt w przybliżeniu liniowy, a dla okręgu, gdzie jest najwięcej
+wierzchołków w otoczce jest najbardziej stromy. Jednakże poza tym, że ma najlepszą złożoność asymptotyczną, to niestety ta implementacja ma największy współczynnik stały w porównaniu z innymi algorytmami 
+i dlatego wypada najgorzej. Jedyny wynik porównywalny z innymi uzyskał w zbiorze typu D, gdzie ma najlepsze warunki - są tylko 4 wierzchołki w otoczce.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu Chana w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1655,6 +1727,12 @@ W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla ko
 
 W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHull dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-quickhull}, 
 \ref{fig:okrag-quickhull}, \ref{fig:prost-quickhull}, \ref{fig:kw-quickhull} widzimy ilustrację danych z tabeli \ref{tab:quickhull}.
+
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm QuickHull z wszystkich wypadła najlepiej. Na tle innych wykresów wygląda jakby miał asymptotyczność stałą. 
+Po zobaczeniu jednak jego wykresu osobno widać, że jest to wykres w przybliżeniu liniowy(z wyglądu), co się zgadza z przewidywaniami teoretycznymi.
+Ma on jednak najmniejszy stały współczynnik względem pozostałych algorytmów, co odpowiada jego zdecydowanie większej prostoty względem innych.
+///
 
 \begin{table}[]
 \centering
@@ -1713,6 +1791,11 @@ W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHu
 W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-dziel}, 
 \ref{fig:okrag-dziel}, \ref{fig:prost-dziel}, \ref{fig:kw-dziel} widzimy ilustrację danych z tabeli \ref{tab:dziel}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm dziel i zwyciężaj wypadł na drugim miejscu zaraz po grahamie. Jego wykres odpowiada przewidywaniom teoretycznym,
+jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
+ten działa w zależności od ich rozmiarów.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu dziel i zwyciężaj w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1769,6 +1852,11 @@ W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwy
 W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrostowy i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-przyrost}, 
 \ref{fig:okrag-przyrost}, \ref{fig:prost-przyrost}, \ref{fig:kw-przyrost} widzimy ilustrację danych z tabeli \ref{tab:przyrost}.
 
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm przyrostowy wypadł odrobinę lepiej od dziel i zwyciężaj. Jego wykres odpowiada przewidywaniom teoretycznym,
+jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
+ten działa w zależności od ich rozmiarów.
+
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu przyrostowego w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1823,6 +1911,12 @@ W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrost
 
 W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-jarvis}, 
 \ref{fig:okrag-jarvis}, \ref{fig:prost-jarvis}, \ref{fig:kw-jarvis} widzimy ilustrację danych z tabeli \ref{tab:jarvis}.
+
+\subsection{Porównanie z przewidywaniami teoretycznymi}
+Algorytm Jarvisa zachowywał się zgodnie z przewidywaniami teoretycznymi. Jego złożoność wynosi O(kn), gdzie k to liczba wierzchołków w otoczce.
+Dla chmury punktów, gdszie liczba wierzchołków w otoczce jest losowa zachowywał się nieregularnie. Dla pozostałych zbiorów: dla rozkładu kołowego
+ukwadratowił się i miał zdecydowanie najgorsze wyniki. Dla zbioru o rozmiarze 5500 wykonywał się niemal 3 min. Jednakże dla pozostałych zbiorów, jego złożoność stanowiła
+przewagę mógł śmiało konkurować z pozostałymi algorytmami O(nlogn) i odznaczał się podobnymi czasami.
 
 \begin{table}[]
 \centering
@@ -2050,6 +2144,7 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
         \label{fig:kw-zbiorczy-2}
     \end{minipage}
 \end{figure}
+
 
 
 \section{Bibliografia}
