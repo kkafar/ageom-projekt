@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-from random import randint
-from copy import deepcopy
-=======
 # from lib.divide import *
->>>>>>> 123669c1ef09155ac2ad3bd07464e0fc1e7b680f
 from lib.det import *
 from lib.tangent import *
 from lib.util import *
@@ -50,11 +45,6 @@ def nextvert(C, curr,accur=10**(-7)):  # dla danego punktu wspolzednymi z Q[i][j
     # zwraca nastepny punkt nalezacy do finalnej otoczki zadanego w takich samych wspolzednych Q[nxt[0]][nxt[1]]
     i, j = curr
     nxt = (i, (j + 1) % len(C[i]))
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 123669c1ef09155ac2ad3bd07464e0fc1e7b680f
     for k in range(len(C)):
 
 
