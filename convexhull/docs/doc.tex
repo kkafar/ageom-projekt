@@ -1063,7 +1063,7 @@ def increase_with_sorting(point2_set: ListOfPoints) -> Union[ListOfPoints, None]
     \subsubsection{Szczegóły}
 
     \begin{itemize}
-        \item   Do wyznaczania otoczki w przypadku podstawowym wykorzystany został algortym Jarvisa, ponieważ dla $k << n$ ma on złożoność właściwie liniową.
+        \item   Do wyznaczania otoczki w przypadku podstawowym wykorzystany został algortym Grahama. Algorytm Jarvisa, który dla małych k powinien działać bardzo dobrze, dawał gorsze rezultaty.
         \item   Sposób łączenia otoczek jest następujący: 
                 \begin{enumerate}
                     \item  Wyznaczamy skrajny prawy punkt $L$ lewej otoczki oraz skrajny lewy $P$ punkt prawej otoczki. 
@@ -1203,7 +1203,7 @@ def divide_conq(point2_set: List[Point], k: int = 2) -> Union[List[Point], None]
     
     def divide_conq_rec(point2_set: List[Point]) -> List[Point]:
         if len(point2_set) <= 2: return point2_set
-        elif len(point2_set) <= k: return jarvis(np.array(point2_set))
+        elif len(point2_set) <= k: return graham(point2_set)
     
         left_convex_hull = divide_conq_rec(point2_set[ : len(point2_set) // 2])
         right_convex_hull = divide_conq_rec(point2_set[len(point2_set) // 2 : ])
@@ -1539,12 +1539,12 @@ współliniowych otoczek), ilości potrzebnych do wykonania porównań i operacj
 W tabeli \ref{tab:graham} przedstawiamy czasy uzyskane przez algorytm Grahama dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-graham}, 
 \ref{fig:okrag-graham}, \ref{fig:prost-graham}, \ref{fig:kw-graham} widzimy ilustrację danych z tabeli \ref{tab:graham}.
 
-\subsection {Porównanie z przewidywaniami teoretycznymi} Kształt dla każdego z typu zbiorów dla algorytmu Grahama przypomina wykres liniowy. Zgdza się to z przewidywaniami teoretycznymi
-dla tegoż algorytmu - ma on złożoność O(n logn). Wykres o takiej złożoności taka bardzo przypomina wykres liniowy.
-Spośród algorytmów o tej złożoności Graham zdaje się być najwolniejszy. Ilość wierzchołków w otoczce nie ma znaczenia
-dla każdego rozkładu graham wykazuje się podobnym czasem.
 
-
+Kształt dla każdego z typu zbiorów dla algorytmu Grahama przypomina wykres liniowy.
+Zgdza się to z przewidywaniami teoretycznymi dla tego algorytmu - ma on złożoność $O(n logn)$. Wykres o takiej złożoności taka bardzo przypomina wykres liniowy.
+Widzimy, na ilustracjach \ref{fig:chmura-graham}, \ref{fig:okrag-graham}, \ref{fig:prost-graham}, \ref{fig:kw-graham}, że algorytm ma taką samą charakterystykę dla wszystykich testowanych 
+zbiorów punktów, choć dla zbioru typu $C$ i w szczególności zbiotu typu $D$ działa znacznie wolniej, jest to związane z dużą liczbą punktów współliniowych na otoczce, a zatem szczególnie wiele razy wykonuje 
+się punkt $6(a)$ algorytmu (ściąganie wierzchołka ze stosu). 
 
 \begin{table}[]
 \centering
@@ -1561,8 +1561,6 @@ dla każdego rozkładu graham wykazuje się podobnym czasem.
 \multicolumn{1}{|c|}{D} & 0.4256 & 0.6523 & 0.924 & 1.2255 & 1.4233 & 1.8752 & 1.9285 & 2.3207 & 2.5692 & 2.88 \\ \hline
 \end{tabular}
 \end{table}
-
-
 
 
 
@@ -1604,12 +1602,12 @@ dla każdego rozkładu graham wykazuje się podobnym czasem.
 W tabeli \ref{tab:lowerupper} przedstawiamy czasy uzyskane przez algorytm górna-dolna dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-lowerupper}, 
 \ref{fig:okrag-lowerupper}, \ref{fig:prost-lowerupper}, \ref{fig:kw-lowerupper} widzimy ilustrację danych z tabeli \ref{tab:lowerupper}.
 
-\subsection{Porównanie z przewidywaniami teoretycznymi} 
-Kształt dla każdego z typu zbiorów dla algorytmu górna-dolna przypomina wykres liniowy.Jest bardzo szybki(szybsze są tylko quickhull i chan)
-na tle Grahama wykres złożoności tego algorytm przypomina raczej stałą. Jednak, gdy wyizolować sam wykres algorytmu góra dół, to widzimy, że także i on przypomina wykres liniowy
-Zgdza się to z przewidywaniami teoretycznymi dla tegoż algorytmu - ma on złożoność O(n logn). 
-Wykres o takiej złożoności taka bardzo przypomina wykres liniowy. 
-Ilość wierzchołków w otoczce nie ma znaczenia czas wykonania algorytmu góra-dół zależy tylko od mocy zbioru punktów, dla którego otoczki szukamy.
+
+Charakterystyka algorytmu jest jednakowa dla wszystkich zbiorów testowych -- jest to algorytm mało wrażliwy na typ danych wejściowych (różne dane nie powodują dgeneracji złożoności, a co za tym idzie
+wydłużenia czasu wykonania). Co przejawia się podobieństwem poszczególnych wykresów \ref{fig:chmura-lowerupper}, \ref{fig:okrag-lowerupper},
+\ref{fig:prost-lowerupper}, \ref{fig:kw-lowerupper} dla kolejnych zbiorów punktów. Kształty wykresów zgadzają się z typem złożoności algorytmu -- $O(nlgn)$. Widzimy, że algorytm górna dolna uzyskuje bardzo 
+zbliożone czasy dla zbiorów typu $A$, $B$, $D$. Dla zbioru typu $C$ notujemy ok. 4-krotnie krótszy czas wykonania (wykres \ref{fig:prost-lowerupper}), na co ma wpływ stosunkowa mała liczba wykonań usuwania wierzchołków ze stosu. 
+
 
 
 \begin{table}[]
@@ -1667,13 +1665,14 @@ Ilość wierzchołków w otoczce nie ma znaczenia czas wykonania algorytmu góra
 W tabeli \ref{tab:chan} przedstawiamy czasy uzyskane przez algorytm Chana dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-chan}, 
 \ref{fig:okrag-chan}, \ref{fig:prost-chan}, \ref{fig:kw-chan} widzimy ilustrację danych z tabeli \ref{tab:chan}.
 
-\subsection{Porównanie z przewidywaniami teoretycznymi}
-Chan spośród wszystkich rozważanych algorytmów wypadł najgorzej względem reszty. Teorytyczna złożoność chana wynosi O(nlogk), gdzie k jest ilością wierzchołków w otoczce. Patrząc na wykresy czasu dla Chana
-ilość wierzchołków w otoczce faktycznie wpływa na szybkość jego działania dla chmury punktów działał bardzo nieregularnie, natomiast
-dla pozostałych rozkładów, o w stałej ilości wierzchołków w otoczce względem wierzchołków zbioru w algorytmie chana dominała natura liniowa.
-Wygląda na to, że przewidywania teoretyczne po części sprawdzająsię dla chana, jego wykres ma kształt w przybliżeniu liniowy, a dla okręgu, gdzie jest najwięcej
-wierzchołków w otoczce jest najbardziej stromy. Jednakże poza tym, że ma najlepszą złożoność asymptotyczną, to niestety ta implementacja ma największy współczynnik stały w porównaniu z innymi algorytmami 
-i dlatego wypada najgorzej. Jedyny wynik porównywalny z innymi uzyskał w zbiorze typu D, gdzie ma najlepsze warunki - są tylko 4 wierzchołki w otoczce.
+
+Teorytyczna złożoność chana wynosi O(nlogk), gdzie k jest ilością wierzchołków w otoczce.Analizując wykresy czasu od liczebności zbioru wejściowego dla Chana
+ilość wierzchołków w otoczce wpływa na szybkość jego działania. Dla chmury punktów (zbiór typu A) działał bardzo nieregularnie (różna liczba wierzchołków otoczki w zbiorze typu A). Natomiast
+dla rozkładów punktów, w których liczba wierzchołków otoczki jest w większości przypadków stała (zbiór typu D) lub niewielka -- algorytm radził sobie dobrze.
+Wygląda na to, że przewidywania teoretyczne po części sprawdzają się dla Chana, jego wykres ma kształt w przybliżeniu liniowy (dokładniej liniowo-logarytmiczny), a dla okręgu, gdzie jest najwięcej
+wierzchołków w otoczce jest najbardziej stromy. Jednakże poza tym, że ma najlepszą złożoność asymptotyczną, to najwyjaźniej implementacja posługująca się w dużym stopniu operacjami na listach języka Python
+posiada największy współczynnik stały w porównaniu z innymi algorytmami i dlatego ostatecznie jest stosunkowo wolny. W zbiorze typu $D$ algorytm Chana zachowuje się (w stosunku np. do algorytmu górna-dolna) niestabilnie
+(w sensie w dużej czułości algorytmu na dokładne ułożenie punktów w zbiorze typu $D$)
 
 \begin{table}[]
 \centering
@@ -1728,11 +1727,8 @@ i dlatego wypada najgorzej. Jedyny wynik porównywalny z innymi uzyskał w zbior
 W tabeli \ref{tab:quickhull} przedstawiamy czasy uzyskane przez algorytm QuickHull dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-quickhull}, 
 \ref{fig:okrag-quickhull}, \ref{fig:prost-quickhull}, \ref{fig:kw-quickhull} widzimy ilustrację danych z tabeli \ref{tab:quickhull}.
 
-\subsection{Porównanie z przewidywaniami teoretycznymi}
-Algorytm QuickHull z wszystkich wypadła najlepiej. Na tle innych wykresów wygląda jakby miał asymptotyczność stałą. 
-Po zobaczeniu jednak jego wykresu osobno widać, że jest to wykres w przybliżeniu liniowy(z wyglądu), co się zgadza z przewidywaniami teoretycznymi.
-Ma on jednak najmniejszy stały współczynnik względem pozostałych algorytmów, co odpowiada jego zdecydowanie większej prostoty względem innych.
-///
+Algorytm QuickHull ma podobną charakterystykę dla wszystkich zbiorów testowych (jest mało wrażliwy na typ danych wejściowych), co możemy zaobserwować na odpowiadających mu wykresach.  
+Uzyskana charakterystyka pokrywa się z przewidywaniami teoretycznymi (kształt wykresu wpasowuje się w charakterystykę funckji liniowo-wykładnicznej). 
 
 \begin{table}[]
 \centering
@@ -1750,6 +1746,9 @@ Ma on jednak najmniejszy stały współczynnik względem pozostałych algorytmó
 \end{tabular}
 \end{table}
 
+Widzimy też, że algorytm ten charakteryzuje się 
+generalnie najkrótszym czasem wykonania w porównaniu z analizowanymi do tej pory algorytmami. Algorytm zachowuje się stabilnie w sensie: zmiana typu danych wejściowych nie wpływa w widoczny sposób 
+na zachowanie się algorytmu, co również pokrywa się z oczekiwaniami teoretycznimi, ponieważ nawet dla dużej liczebności zbiorów punktów, algorytm szybko redukuje tą liczbę. 
 
 \begin{figure}[]
     \centering
@@ -1791,10 +1790,14 @@ Ma on jednak najmniejszy stały współczynnik względem pozostałych algorytmó
 W tabeli \ref{tab:dziel} przedstawiamy czasy uzyskane przez algorytm Dziel i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-dziel}, 
 \ref{fig:okrag-dziel}, \ref{fig:prost-dziel}, \ref{fig:kw-dziel} widzimy ilustrację danych z tabeli \ref{tab:dziel}.
 
-\subsection{Porównanie z przewidywaniami teoretycznymi}
-Algorytm dziel i zwyciężaj wypadł na drugim miejscu zaraz po grahamie. Jego wykres odpowiada przewidywaniom teoretycznym,
-jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
-ten działa w zależności od ich rozmiarów.
+
+Uzyskana charakterystyka algorytmu dziel i zwyciężaj zgadza się z przewidywaniami teoretycznymi. Algorytm ten jest algorytmem niewrażliwym na typ danych wejściowych, co dobrze ilustrują wyżej wymienione wykresy 
+(charakterystyka wykresu nie zmienia się w zależności od rodzaju danych wejściowych) -- zgadza się to z przewidywaniami teoretycznymi. Testowanie algorytmu pokazało, że przy dużych mocach zbiorów testowych, 
+w celu uzyskania lepszych rezultatów, należy zwiększyć stałą $k$ (przy $n = 5000$ najlepiej sprawdzoło się $k \in [40, 50]$). 
+
+
+W zbiorze typu $D$ obserwujemy wzrost czasu wykonania (ok. 4-krotny) co może być skutkiem zastosowania algorytmu Grahama do wyznaczania otoczek w przypadku bazowym (algorytm Grahama działał stosunkowo wolno 
+w zbiorze typu $D$ ze względu na dużą ilość operacji korygowania otoczki (usuwania wierzchołków ze stosu).
 
 \begin{table}[]
 \centering
@@ -1852,10 +1855,12 @@ ten działa w zależności od ich rozmiarów.
 W tabeli \ref{tab:przyrost} przedstawiamy czasy uzyskane przez algorytm przyrostowy i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-przyrost}, 
 \ref{fig:okrag-przyrost}, \ref{fig:prost-przyrost}, \ref{fig:kw-przyrost} widzimy ilustrację danych z tabeli \ref{tab:przyrost}.
 
-\subsection{Porównanie z przewidywaniami teoretycznymi}
-Algorytm przyrostowy wypadł odrobinę lepiej od dziel i zwyciężaj. Jego wykres odpowiada przewidywaniom teoretycznym,
-jest to wykres w przybliżeniu liniowy bardzo powoli skłaniający się ku górze. Niezależnie od rozkładu punktów algorytm
-ten działa w zależności od ich rozmiarów.
+
+Uzyskana charakterystyka algorytmu odpowiada oczekiwaniom opartym na wiedzy teoretycznej -- algorytm zachowuje się zgodnie z funkcją liniowo-logarytmiczną. 
+Algorytm ten jest algorytmem niewrażliwym na typ danych wejściowych, w sensie braku zmiany charakterystyki. Dla zbioru typu
+$B$ obserwujemy znaczący wzrost czasu wykonania w stosunku do pozostałych typów zbiorów, nawet ok. $25$ razy, co jest bezpośrednio spowodowane dużą liczbą puntków otoczki, a co za tym idzie -- możliwie 
+największą liczbą operacji przy aktualizacji otoczki. 
+
 
 \begin{table}[]
 \centering
@@ -1909,15 +1914,6 @@ ten działa w zależności od ich rozmiarów.
 
 \subsection{Algorytm Jarvisa}
 
-W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-jarvis}, 
-\ref{fig:okrag-jarvis}, \ref{fig:prost-jarvis}, \ref{fig:kw-jarvis} widzimy ilustrację danych z tabeli \ref{tab:jarvis}.
-
-\subsection{Porównanie z przewidywaniami teoretycznymi}
-Algorytm Jarvisa zachowywał się zgodnie z przewidywaniami teoretycznymi. Jego złożoność wynosi O(kn), gdzie k to liczba wierzchołków w otoczce.
-Dla chmury punktów, gdszie liczba wierzchołków w otoczce jest losowa zachowywał się nieregularnie. Dla pozostałych zbiorów: dla rozkładu kołowego
-ukwadratowił się i miał zdecydowanie najgorsze wyniki. Dla zbioru o rozmiarze 5500 wykonywał się niemal 3 min. Jednakże dla pozostałych zbiorów, jego złożoność stanowiła
-przewagę mógł śmiało konkurować z pozostałymi algorytmami O(nlogn) i odznaczał się podobnymi czasami.
-
 \begin{table}[]
 \centering
 \caption{Czas wykonania algorytmu Jarvisa w zależności od typu zbioru testowego oraz mocy zbioru punktów.}
@@ -1933,6 +1929,16 @@ przewagę mógł śmiało konkurować z pozostałymi algorytmami O(nlogn) i odzn
 \multicolumn{1}{|c|}{D} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
 \end{tabular}
 \end{table}
+
+
+W tabeli \ref{tab:jarvis} przedstawiamy czasy uzyskane przez algorytm Jarvisa i zwyciężaj dla kolejnych zbiorów punktów, przy różnej liczebności punktów w zbiorze. Na wykresach \ref{fig:chmura-jarvis}, 
+\ref{fig:okrag-jarvis}, \ref{fig:prost-jarvis}, \ref{fig:kw-jarvis} widzimy ilustrację danych z tabeli \ref{tab:jarvis}.
+
+Algorytm Jarvisa zachowywał się zgodnie z przewidywaniami teoretycznymi. Jego złożoność wynosi O(kn), gdzie k to liczba wierzchołków w otoczce, a zatem jego złożoność \emph{mocno} zależy od liczby punktów otoczki. 
+Dla chmury punktów (zbioru typu $A$), gdzie liczba wierzchołków otoczki może się znacząco wahać - zahowywał się nieregularnie. 
+Dla zbioru typu $B$ (punkty na okręgu), gdzie $k ~ n$ algorytm Jarvisa staje się algorytmem kwadratowym, co bardzo wyraźnie widzimy na wykresie \ref{fig:okrag-jarvis}. Dla zbioru o rozmiarze 5500 wykonywał się niemal 3 min.
+Dla zbiorów o małej liczbie punktów otoczki ($C$, $D$) był porównywalny z algorytmami liniowo-logarytmicznymi. 
+
 
 
 
@@ -1992,7 +1998,10 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 
 \subsection{Zbiór typu A}
 
-\begin{table}[]
+Zbiór losowych punktów płaszczyzny, charakteryzuje się różną (w zależności od danej generacji) liczbą wierzchołków otoczki, jednocześnie posiadając małą liczbę konfiguracji puntków współliniowych (przez konfigurację rozumiemy
+układ rozpoznawany jako współliniowy w konkretnych algorytmach, np. algorytmie Grahama)
+
+\begin{table}[h]
 \centering
 \caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu A przy różnych mocach zbiorów punktów.}
 \label{tab:chmura}
@@ -2010,6 +2019,18 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 \multicolumn{1}{|c|}{$JR$} & 0.1379 & 0.2058 & 0.2217 & 0.213 & 0.3311 & 0.3635 & 0.307 & 0.3775 & 0.3808 & 0.3825 \\ \hline
 \end{tabular}
 \end{table}
+
+\begin{itemize}
+    \item Na wykresie \ref{fig:chmura-zbiorczy} widzimy, że wszystkie algorytmy $O(n lgn)$, w stosunku do algorytmów Jarvisa i Chana, zachowywały się porównywalnie.
+    \item  Algorytmy Jarvisa i Chana wykazały się zdecydowanie
+najwolniejszym działaniem -- przy $n = 5500$ algorytm Chana działał ok. 60 razy wolniej niż QuickHull, a ok. 13.5 raza wolniej od średniego czasu wykonania algorytmów liniowo-logarytmicznych.
+    \item Algorytm Jarvisa działał zdecydowanie wolniej od algorytmów liniowo-logarytmicznych -- średno ok. 5.5 raza wolniej od średniego czasu wykonania algorytmów liniowo-logarytmicznych. 
+    \item Z wykresu \ref{fig:chmura-zbiorczy-2} widzimy wyraźnie, że najlepsze czasy wykonania uzyskał algorytm QuickHull.
+    \item Spośród algorytmów liniowo-logarymtmicznych najwolniejszym był algorytm Grahama.  
+\end{itemize}
+
+
+
 
 
 \begin{figure}[]
@@ -2032,8 +2053,9 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 
 \subsection{Zbiór typu B}
 
+Zbiór losowych punktów okręgu. Charakteryzuje się możliwie największą liczbą punktów otoczki (wszystkie punkty zbioru należą do otoczki).
 
-\begin{table}[]
+\begin{table}[h]
 \centering
 \caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu B przy różnych mocach zbiorów punktów. }
 \label{tab:okrag}
@@ -2051,6 +2073,13 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 \multicolumn{1}{|c|}{$JR$} & 5.68 & 12.88 & 22.73 & 35.64 & 51.30 & 69.42 & 90.22 & 113.80 & 141.27 & 169.58 \\ \hline
 \end{tabular}
 \end{table}
+
+\begin{itemize}
+    \item Zgodnie z oczekiwaniami, najwolniejszym algorytmem jest algorytm Jarvisa, który dla $n = 5500$ wykonywał się ok. 11000 razy wolniej od algorytmu QuickHull (tabela \ref{tab:okrag}, wykres \ref{fig:okrag-zbiorczy}). 
+    \item Najszybszym sposród testowanych algorytmów jest algorytm QuickHull. 
+    \item Algorytm górna--dolna ma czas wykonania bardzo bliski algorytmowi QuickHull.
+    \item Spośród algorytmów typowo liniowo-logarytmicznych (względem $n$) najwolniejszym jest algorytm przyrostowy (wykres \ref{fig:okrag-zbiorczy-2})
+\end{itemize}
 
 
 \begin{figure}[]
@@ -2072,7 +2101,9 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 
 \subsection{Zbiór typu C}
 
-\begin{table}[]
+Zbiór punktów leżących na obwodzie prostokąta. Charakteryzuje się ograniczoną przez stałą $k = 8$ liczbą punktów otoczki oraz dużą liczba konfiguracji współliniowych (sens jak w zbiorze typu A). 
+
+\begin{table}[h]
 \centering
 \caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu C przy różnych mocach zbiorów punktów.}
 \label{tab:prost}
@@ -2090,6 +2121,14 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 \multicolumn{1}{|c|}{$JR$} & 0.0529 & 0.077 & 0.1046 & 0.1306 & 0.1543 & 0.184 & 0.2086 & 0.2304 & 0.2571 & 0.2858 \\ \hline
 \end{tabular}
 \end{table}
+
+
+\begin{itemize}
+    \item Obserwujemy znaczną poprawę (w stosunku do zbiorów typu A, B) czasu wykonania algorytmu Jarvisa, który teraz jest porównywalny z alogyrtmami typowo liniowo-logarytmicznymi. 
+    \item Zdecydowanie najwolniejszym algorytmem okazał się  być algorytm Chana. 
+    \item Najszybszym algorytmem okazał się być algorytm QuickHull.
+    \item Dla $n > 4000$ algorytm Jarvisa staje się szybszy od algorytmu dziel i zwyciężaj (trend ten utrzymywał się także dla większych mocy zbiorów testowych) (wykres \ref{fig:prost-zbiorczy-2}) 
+\end{itemize}
 
 \begin{figure}[]
     \centering
@@ -2109,8 +2148,12 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 
 \subsection{Zbiór typu D}
 
+Zbiór punktów leżących na przekątnych i dwóch bokach kwadratu. Charakteryzuje się ograniczoną liczbą punktów otoczki (pomiając bardzo małe n, otoczka jest zawsze 4 elementowa) oraz dużą liczbą konfiguracji 
+współliniowych (znaczenie jak przy zbiorze typu A) w szczególności dla algorytmu Grahama. 
 
-\begin{table}[]
+
+
+\begin{table}[h]
 \centering
 \caption{Czasy wykonania poszczególnych algorytmów dla zbioru typu D przy różnych mocach zbiorów punktów.}
 \label{tab:kw}
@@ -2128,6 +2171,14 @@ Dla uproszczenia zapisu w tabelach wprowazdamy oznaczenia dla poszczególnych al
 \multicolumn{1}{|c|}{$JR$} & 0.1094 & 0.1572 & 0.2167 & 0.2611 & 0.3129 & 0.3711 & 0.4218 & 0.4774 & 0.5255 & 0.5886 \\ \hline
 \end{tabular}
 \end{table}
+
+\begin{itemize}
+    \item Najszybszym algorytmem okazał się być algorytm QuickHull. 
+    \item Najwolniejszym spośród algorytmów liniowo-logarytmicznych jest algorytm Grahama. 
+    \item Obserwujemy znaczną poprawę (w stosunku do zbiorów typu A i B) czasu wykonania algorytmu Jarvisa, który teraz jest porównywalny z algorytmami liniowo-logarytmicznymi. 
+    \item Najwolniejszym algorytmem jest algorytm Chana. 
+\end{itemize}
+
 
 \begin{figure}[]
     \centering
