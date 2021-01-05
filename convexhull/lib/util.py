@@ -1,7 +1,6 @@
 """ K. Kafara """
 
 import json
-# import simplejson
 from typing import Literal, Union
 from lib.mytypes import *
 from random import randint
@@ -10,21 +9,6 @@ import matplotlib.colors as mcolors
 import math
 import numpy as np
 import csv
-
-#costam
-
-def eq_eps(value: float, expected: float, eps: float = 1e-7) -> bool:
-    """ == co do eps """
-    return (value > expected - eps and value < expected + eps)
-
-def le_eps(value: float, expected: float, eps: float = 1e-7) -> bool:
-    "<= co do epsilonu"
-    return (value < expected + eps)
-
-def ge_eps(value: float, expected: float, eps: float = 1e-7) -> bool:
-    ">= z dokladoscia do eps"
-    return (value > expected - eps)
-
 
 # Posługujemy się tym wyznacznikiem bazując na doświadczeniu z zad. 1 (poradził sobie najlepiej)
 def det3x3( ux, uy, uz,
@@ -51,16 +35,6 @@ def orientation(p1: Point, p2: Point, p3: Point, eps: float = 1e-5) -> Literal[-
     else:
         return 1
 
-        
-def save_segments_to_json(path: str, lines: ListOfSegments, indent: int = None) -> None:
-    with open(path, 'w') as file: 
-        json.dump(lines, file, indent=indent)
-
-
-def read_segments_from_json(path: str) -> ListOfSegments:
-    with open(path, 'r') as file:
-        return json.load(file)
-    
     
 def save_points_to_json(path: str, points: ListOfPoints, indent: int = None) -> None:
     with open(path, 'w') as file:
@@ -77,50 +51,6 @@ def save_data_csv(path: str, data):
         writer = csv.writer(csvfile, delimiter=',')
         for row in data:
             writer.writerow(row)
-    
-        
-    
-def intersection(segment1: Segment, segment2: Segment, eps: float = 1e-9) -> Union[Point, None]:
-    """ Sprawdza czy 2 odcinki się przecinają. Jeżeli tak to zwraca punkt przecięcia. 
-    Podzane odcinki nie mogą przecinać się w więcej niż 1 punkcie. """
-
-    denom = (segment1[0][1] - segment1[1][1]) * (segment2[1][0] - segment2[0][0]) - (segment1[1][0] - segment1[0][0]) * (segment2[0][1] - segment2[1][1])
-    # print(f'denom: ({segment1[0][1]} - {segment1[1][1]}) * ({segment2[1][0]} - {segment2[0][0]}) - ({segment1[1][0]} - {segment1[0][0]}) * ({segment2[0][1]} - {segment2[1][1]})')
-    # odcinki są równoległe
-    if denom > -eps and denom < eps: return None
-
-    numer = (segment1[0][1] - segment2[0][1]) * (segment2[1][0] - segment2[0][0]) + (segment1[0][0] - segment2[0][0]) * (segment2[0][1] - segment2[1][1])
-
-    param_t = numer / denom 
-    param_u = ((1 - param_t) * segment1[0][0] + param_t * segment1[1][0] - segment2[0][0]) / (segment2[1][0] - segment2[0][0])
-
-    if (param_t > -eps and param_t < 1 + eps) and (param_u > -eps and param_u < 1 + eps):
-        # print(f'intersection: t: {param_t}, u: {param_u}, numer: {numer}, denom: {denom}, segments:\n{segment1}\n{segment2}')
-        return [(1 - param_t) * segment1[0][0] + param_t * segment1[1][0], (1 - param_t) * segment1[0][1] + param_t * segment1[1][1]]
-    else:
-        return None
-
-
-def intersection_with_sweep(segment: Segment, sweep_y: float, eps: float = 1e-7) -> Union[Point, None]:
-    """ Sprawdza przecięcie odcinka (niepoziomego) z poziomą prostą y = sweep_y """
-    if eq_eps(segment[0][1], sweep_y, eps=1e-3):
-        return segment[0]
-    elif eq_eps(segment[1][1], sweep_y, eps=1e-3):
-        return segment[1]
-
-    denom = segment[1][1] - segment[0][1]
-
-    if denom > -eps and denom < eps:
-        return None      # odcinek jest poziomy, nie rozważamy takich
-
-    param_t = (sweep_y - segment[0][1]) / denom
-
-    if param_t > -eps and param_t < 1 + eps:
-        return [(1-param_t) * segment[0][0] + param_t * segment[1][0], sweep_y]
-    
-    else:
-        return None
-
         
         
 def index_of_min(points: ListOfPoints, cmp_idx = 0) -> Union[int, None]:
@@ -222,9 +152,6 @@ def tangent_r(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-            # print(p)
-            # print(Q)
-            # print()
             return None
 
         mid = (l + r) // 2
@@ -263,9 +190,6 @@ def tangent_l(p, Q, accur=10 ** (-7)):  # Q-zbior punktow w formie otoczki
 
     def tangetUtil(p, Q, l, r):
         if r < l:  # zdarza sie tylko, gdy punkt jest wewnatrz otoczki
-            print(p)
-            print(Q)
-            print()
             return None
 
         mid = (l + r) // 2

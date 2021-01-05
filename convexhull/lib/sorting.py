@@ -3,11 +3,11 @@ from sys import path
 path.append(os.path.dirname(os.path.realpath(__file__)) + "/../")
 
 from random import randint
-from typing import Callable
+from typing import Callable, List
 from lib.stack import Stack
 
 
-def partition_cmp(arr: list, p: int, q: int, cmp: Callable = lambda x, y: x <= y) -> int: 
+def partition_cmp(arr: List, p: int, q: int, cmp: Callable = lambda x, y: x <= y) -> int: 
     """ Modyfikuje arr w miejscu. cmp powinien implementować <= dla elementów arr """
 
     i = p - 1
@@ -28,7 +28,7 @@ def partition_cmp(arr: list, p: int, q: int, cmp: Callable = lambda x, y: x <= y
     return i + 1
             
             
-def qsort_iterative(arr: list, cmp: Callable = lambda x, y: x <= y):
+def qsort_iterative(arr: List, cmp: Callable = lambda x, y: x <= y):
     stack = Stack(len(arr))
     
     stack.push(0)
