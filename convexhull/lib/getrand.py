@@ -1,17 +1,12 @@
 """ Moduł dostarczający funkcji generujących zbiory / wartości losowe """
 
 import numpy as np
-# from typing import List
 from typing import Tuple
 from numpy import random
-# from lib.vector2 import Vector2
 
 def dist(point_a, point_b):
     return np.sqrt((point_a[0] - point_b[0])** 2 + (point_a[1] - point_b[1])**2)
 
-# Możliwa optymalizacja:
-# przekazywanie a, b prostej jako paramety / informacji o tym, że jest pionowa - nie będziemy bez 
-# potrzeby mnożyć obliczeń. Ale to na koniec!
 def rand_seg_point(point_a, point_b):
     """ Zwraca losowy punkt leżący na odcinku point_a, point_b """     
     
@@ -124,30 +119,6 @@ def rand_circle_points( n: int = 10,
         circle[i][1] = r * np.sin(rn) + y
 
     return circle
-#################################################################################
-
-
-#################################################################################
-def rand_line_points(   n: int,
-                        point_a: np.array,
-                        point_b: np.array, 
-                        low_x: float = -1,
-                        high_x: float = 1, 
-                        data_type: str = 'float64') -> np.array:
-    """ Zwraca tablię [ [x1, y1], ..., [x_n, y_n] ] będących (pseudo) losowymi punktami 
-        leżącymi na prostej zadanej 2 punkty przesłane jako parametry"""
-
-    rng = np.random.default_rng()
-    line = np.empty(shape=(n, 2), dtype=data_type)
-    
-    aval = (point_b[1] - point_a[1]) / (point_b[0] - point_a[0])
-    bval = (point_a[1] - aval * point_a[0])
-    for i in range(n):
-        param_t = rng.random() * (high_x - low_x) + low_x
-        line[i][0] = param_t
-        line[i][1] = aval * param_t + bval 
-
-    return line
 #################################################################################
 
 
